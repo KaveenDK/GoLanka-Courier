@@ -4,10 +4,85 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="679485e4-530c-449b-9133-10023b47a5d3" name="Changes" comment="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings.">
+    <list default="true" id="679485e4-530c-449b-9133-10023b47a5d3" name="Changes" comment="Redesign customer dashboard with enhanced UI and responsive dark mode support">
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/acc-verification.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/admin-dashboard.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/customer-signup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/driver-dashboard.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/driver-signup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/index.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/reset-password.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/signin.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/staff-dashboard.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshots/track-parcel.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/pages/auth/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/pages/auth/signup.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/pages/customer/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/pages/customer/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/GoLankaCourierApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/GoLankaCourierApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/AppProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/AppProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/JwtProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/JwtProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/MailConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/MailConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/WebMvcConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/DriverController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/DriverController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/MapController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/MapController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/StaffController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/StaffController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/AuthRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/AuthRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/AuthResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/AuthResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/LoginResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/LoginResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/TokenRefreshDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/auth/TokenRefreshDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/driver/DriverApplicationDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/driver/DriverApplicationDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/parcel/ParcelCreateDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/parcel/ParcelCreateDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/parcel/ParcelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/parcel/ParcelDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/payment/PaymentInitDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/payment/PaymentInitDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/PasswordResetDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/PasswordResetDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/RegisterCustomerDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/RegisterCustomerDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/UserProfileDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/user/UserProfileDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Address.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Address.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/DriverApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/DriverApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Parcel.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Parcel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/ParcelStatusHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/ParcelStatusHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/PaymentTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/PaymentTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/RefreshToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/exception/ApiException.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/exception/ApiException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/DriverApplicationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/DriverApplicationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/ParcelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/ParcelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/ParcelStatusHistoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/ParcelStatusHistoryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/PaymentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/PaymentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/RefreshTokenRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/RoleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/RoleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/scheduler/CleanupExpiredTokensJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/scheduler/CleanupExpiredTokensJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/DriverApplicationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/DriverApplicationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/ParcelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/ParcelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/auth/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/auth/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/auth/TokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/auth/TokenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/DriverApplicationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/DriverApplicationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/EmailServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/ParcelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/ParcelServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/PaymentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/PaymentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/Mapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/Mapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/ValidationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/ValidationUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,36 +131,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.GoLankaCourierApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;KaveeN&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Softwares/IntelliJ IDEA/GoLankaCourier&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.GoLankaCourierApplication.executor": "Run",
+    "git-widget-placeholder": "KaveeN",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Softwares/IntelliJ IDEA/GoLankaCourier",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="GoLankaCourierApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="GoLankaCourier" />
@@ -111,7 +187,8 @@
       <option name="presentableId" value="Default" />
       <updated>1758437071692</updated>
       <workItem from="1758437073625" duration="138000" />
-      <workItem from="1758437313326" duration="24916000" />
+      <workItem from="1758437313326" duration="26033000" />
+      <workItem from="1758473669073" duration="1915000" />
     </task>
     <task id="LOCAL-00001" summary="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings.">
       <option name="closed" value="true" />
@@ -121,7 +198,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758466995757</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Redesign customer dashboard with enhanced UI and responsive dark mode support">
+      <option name="closed" value="true" />
+      <created>1758472413445</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758472413445</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +214,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings." />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings." />
+    <MESSAGE value="Redesign customer dashboard with enhanced UI and responsive dark mode support" />
+    <option name="LAST_COMMIT_MESSAGE" value="Redesign customer dashboard with enhanced UI and responsive dark mode support" />
   </component>
 </project>

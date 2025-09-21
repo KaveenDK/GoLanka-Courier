@@ -18,7 +18,6 @@
     - [Frontend (static)](#frontend-static)
 - [API quick tests (curl)](#api-quick-tests-curl)
 - [Troubleshooting tips](#troubleshooting-tips)
-- [Student info & required YouTube video title](#student-info--required-youtube-video-title)
 - [License](#license)
 
 ---
@@ -50,10 +49,6 @@ GoLanka Courier is a parcel delivery management system allowing users to registe
 - **Tools:** Git, GitHub, Postman
 
 ---
-
-## Demo video
-
-**YouTube link:** `https://youtu.be/your-video-id-here`
 
 ---
 
@@ -354,8 +349,6 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 **Name:** Dimantha Kaveen  
 **Email:** dtkaviya1002@gmail.com
-
-**YouTube video title:** "GoLanka Courier - Parcel Management System - Spring Boot Web Application Demo"
 
 ---
 
