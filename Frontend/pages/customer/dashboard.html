@@ -1,13 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Customer Dashboard — GoLanka Courier</title>
     <link rel="icon" href="../../assets/images/logo.png" />
 
-    <!-- Tailwind CDN (for utility classes) -->
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind config for custom colors & dark mode via class
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: "#0ea5a4", 700: "#089e9b" },
+              accent: { DEFAULT: "#ffb020" },
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-out",
+              "slide-up": "slideUp 0.5s ease-out",
+              "pulse-soft": "pulseSoft 2s infinite",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(10px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              pulseSoft: {
+                "0%, 100%": { opacity: "1" },
+                "50%": { opacity: "0.8" },
+              },
+            },
+          },
+        },
+      };
+    </script>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -19,319 +52,601 @@
     <link rel="stylesheet" href="../../css/styles.css" />
     <link rel="stylesheet" href="../../css/animations.css" />
 
-    <!-- Small CSS replacements for .btn/.input used on this page (plain CSS, no Tailwind @apply) -->
     <style>
-      :root {
-        --btn-radius: 0.5rem;
-        --btn-padding-x: 0.75rem;
-        --btn-padding-y: 0.5rem;
-        --btn-gap: 0.5rem;
-      }
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--btn-gap);
-        border-radius: var(--btn-radius);
-        padding: var(--btn-padding-y) var(--btn-padding-x);
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid transparent;
-      }
-
-      .btn-ghost {
-        background: transparent;
-        border-color: #e5e7eb; /* gray-200 */
-        color: inherit;
-      }
-
-      .btn-primary {
-        background: #4f46e5; /* indigo-600 */
-        color: #fff;
-        border-color: transparent;
-      }
-
-      .btn-danger {
-        background: #dc2626; /* red-600 */
-        color: #fff;
-        border-color: transparent;
-      }
-
-      .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-      }
-      .btn-xs {
-        padding: 0.125rem 0.4rem;
-        font-size: 0.75rem;
-      }
-
-      .btn[disabled] {
-        opacity: 0.65;
-        cursor: not-allowed;
+      body {
+        font-family: "Inter", sans-serif;
       }
 
       .input {
-        width: 100%;
-        border-radius: 0.5rem;
-        border: 1px solid #d1d5db; /* gray-300 */
-        padding: 0.5rem 0.75rem;
-        font-size: 1rem;
-        box-sizing: border-box;
+        @apply w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 transition-all duration-300;
       }
 
-      .field-error {
-        color: #b91c1c;
-        font-size: 0.85rem;
-        margin-top: 0.25rem;
+      .btn {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-3 font-medium transition-all duration-300;
       }
 
-      /* small hover/focus helpers */
-      .btn:hover:not([disabled]) {
-        filter: brightness(0.98);
+      .btn-primary {
+        @apply bg-primary hover:bg-primary-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
       }
-      .input:focus {
-        outline: 2px solid rgba(99, 102, 241, 0.15);
-        border-color: #6366f1;
+
+      .btn-secondary {
+        @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200;
+      }
+
+      .btn-danger {
+        @apply bg-red-500 hover:bg-red-600 text-white;
+      }
+
+      .btn-sm {
+        @apply px-3 py-2 text-sm;
+      }
+
+      .btn-xs {
+        @apply px-2 py-1 text-xs;
+      }
+
+      .metric-card {
+        @apply bg-gradient-to-br from-white to-slate-50 dark:from-gray-800 dark:to-gray-700 rounded-xl shadow-md p-5 border border-gray-100 dark:border-gray-600 transition-all duration-300 hover:shadow-lg;
+      }
+
+      .metric-value {
+        @apply text-3xl font-bold text-gray-800 dark:text-white mb-1;
+      }
+
+      .metric-label {
+        @apply text-sm text-gray-500 dark:text-gray-400;
+      }
+
+      .metric-update {
+        @apply text-xs text-gray-400 dark:text-gray-500 mt-2;
+      }
+
+      .card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700;
+      }
+
+      .card-header {
+        @apply px-6 py-4 border-b border-gray-100 dark:border-gray-700;
+      }
+
+      .card-title {
+        @apply text-lg font-semibold text-gray-800 dark:text-white;
+      }
+
+      .card-body {
+        @apply p-6;
+      }
+
+      .status-badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+      }
+
+      .status-pending {
+        @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+      }
+
+      .status-active {
+        @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+      }
+
+      .status-delivered {
+        @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+      }
+
+      .status-cancelled {
+        @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+      }
+
+      .table-header {
+        @apply bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+      }
+
+      .table-cell {
+        @apply px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200;
+      }
+
+      .profile-avatar {
+        @apply w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold;
+      }
+
+      .notification-item {
+        @apply p-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200;
+      }
+
+      .theme-toggle {
+        @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-200 transition-all duration-300;
+      }
+
+      .theme-toggle:hover {
+        @apply bg-gray-300 dark:bg-gray-600;
+      }
+
+      .nav-link {
+        @apply text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200;
+      }
+
+      .grid-container {
+        @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+      }
+
+      .grid-main {
+        @apply lg:col-span-2 space-y-6;
+      }
+
+      .grid-sidebar {
+        @apply space-y-6;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInUp {
+        from {
+          transform: translateY(10px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .animate-slide-up {
+        animation: slideInUp 0.5s ease-out;
       }
     </style>
   </head>
 
   <body
-    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300"
   >
-    <!-- INLINE header (no remote load) -->
-    <header class="bg-white shadow mb-6">
-      <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img
-            src="../../assets/images/logo.png"
-            alt="logo"
-            class="w-10 h-10 object-contain"
-          />
-          <div>
-            <div class="font-bold">GoLanka Courier</div>
-            <div class="text-xs text-slate-500">Fast parcel delivery</div>
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-3">
+            <img
+              src="../../assets/images/logo.png"
+              alt="GoLanka Courier"
+              class="h-10 w-10"
+            />
+            <div>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                GoLanka Courier
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Fast parcel delivery
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <button
+              id="theme-toggle"
+              class="theme-toggle"
+              aria-label="Toggle dark mode"
+            >
+              <svg
+                class="w-5 h-5 hidden dark:block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                ></path>
+              </svg>
+              <svg
+                class="w-5 h-5 block dark:hidden"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+
+            <nav class="hidden md:flex space-x-6">
+              <a href="../customer/dashboard.html" class="nav-link font-medium"
+                >Dashboard</a
+              >
+              <a href="../customer/profile.html" class="nav-link">Profile</a>
+              <a
+                href="../auth/signin.html"
+                id="top-signout"
+                class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                >Sign out</a
+              >
+            </nav>
           </div>
         </div>
-        <nav>
-          <a href="../customer/dashboard.html" class="text-sm mr-4"
-            >Dashboard</a
-          >
-          <a href="../customer/profile.html" class="text-sm mr-4">Profile</a>
-          <a
-            href="../auth/signin.html"
-            id="top-signout"
-            class="text-sm text-red-600"
-            >Sign out</a
-          >
-        </nav>
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-6">
-      <header
-        class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 animate-fade-in"
       >
         <div>
-          <h1 class="text-2xl font-bold">
-            Welcome back, <span id="customerName">Customer</span>
+          <h1
+            class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
+          >
+            Welcome back,
+            <span id="customerName" class="text-primary">Customer</span>
           </h1>
-          <p class="text-sm text-slate-500">
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
             Overview of your recent shipments and account
           </p>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button id="refreshDashboardBtn" class="btn btn-ghost">
+        <div class="flex items-center space-x-3 mt-4 md:mt-0">
+          <button id="refreshDashboardBtn" class="btn btn-secondary">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              ></path>
+            </svg>
             Refresh
           </button>
           <button id="createQuickBtn" class="btn btn-primary">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
             Create Shipment
           </button>
         </div>
-      </header>
+      </div>
 
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
+      <div class="grid-container">
+        <div class="grid-main">
           <!-- Metrics -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
-              <span class="text-xs text-slate-400">Active Shipments</span>
-              <span id="metricActive" class="text-2xl font-bold mt-2">—</span>
-              <span class="text-xs text-slate-500 mt-2"
-                >Updated <span id="metricUpdatedActive">—</span></span
-              >
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-slide-up"
+            style="animation-delay: 0.1s"
+          >
+            <div class="metric-card">
+              <div class="metric-value" id="metricActive">—</div>
+              <div class="metric-label">Active Shipments</div>
+              <div class="metric-update">
+                Updated <span id="metricUpdatedActive">—</span>
+              </div>
             </div>
-            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
-              <span class="text-xs text-slate-400">Delivered</span>
-              <span id="metricDelivered" class="text-2xl font-bold mt-2"
-                >—</span
-              >
-              <span class="text-xs text-slate-500 mt-2">Last 30 days</span>
+            <div class="metric-card">
+              <div class="metric-value" id="metricDelivered">—</div>
+              <div class="metric-label">Delivered</div>
+              <div class="metric-update">Last 30 days</div>
             </div>
-            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
-              <span class="text-xs text-slate-400">Pending Payments</span>
-              <span id="metricPending" class="text-2xl font-bold mt-2">—</span>
-              <span class="text-xs text-slate-500 mt-2">Requires action</span>
+            <div class="metric-card">
+              <div class="metric-value" id="metricPending">—</div>
+              <div class="metric-label">Pending Payments</div>
+              <div class="metric-update">Requires action</div>
             </div>
-            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
-              <span class="text-xs text-slate-400">Total Spent (LKR)</span>
-              <span id="metricSpent" class="text-2xl font-bold mt-2">—</span>
-              <span class="text-xs text-slate-500 mt-2">All time</span>
+            <div class="metric-card">
+              <div class="metric-value" id="metricSpent">—</div>
+              <div class="metric-label">Total Spent (LKR)</div>
+              <div class="metric-update">All time</div>
             </div>
           </div>
 
           <!-- Recent shipments -->
-          <div class="bg-white rounded-xl shadow p-4">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-lg font-semibold">Recent shipments</h2>
-              <div class="text-sm text-slate-500">
-                Showing up to <span id="recentLimit">10</span>
+          <div class="card animate-slide-up" style="animation-delay: 0.2s">
+            <div class="card-header flex items-center justify-between">
+              <h2 class="card-title">Recent Shipments</h2>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                Showing up to
+                <span id="recentLimit" class="font-medium">10</span>
               </div>
             </div>
+            <div class="card-body p-0">
+              <div class="overflow-x-auto">
+                <table
+                  class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+                >
+                  <thead>
+                    <tr>
+                      <th class="table-header px-6 py-3">Tracking</th>
+                      <th class="table-header px-6 py-3">Recipient</th>
+                      <th class="table-header px-6 py-3">Status</th>
+                      <th class="table-header px-6 py-3">Created</th>
+                      <th class="table-header px-6 py-3">Service</th>
+                      <th class="table-header px-6 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="recentTableBody"
+                    class="divide-y divide-gray-200 dark:divide-gray-700"
+                  >
+                    <!-- rows inserted by JS -->
+                    <tr>
+                      <td
+                        colspan="6"
+                        class="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                      >
+                        <div class="flex justify-center">
+                          <svg
+                            class="animate-spin h-8 w-8 text-primary"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              class="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              stroke-width="4"
+                            ></circle>
+                            <path
+                              class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        </div>
+                        <p class="mt-4">Loading shipments...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full text-left min-w-[800px]">
-                <thead>
-                  <tr class="text-xs text-slate-500 border-b">
-                    <th class="py-2 px-3">Tracking</th>
-                    <th class="py-2 px-3">Recipient</th>
-                    <th class="py-2 px-3">Status</th>
-                    <th class="py-2 px-3">Created</th>
-                    <th class="py-2 px-3">Service</th>
-                    <th class="py-2 px-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="recentTableBody" class="divide-y">
-                  <!-- rows inserted by JS -->
-                </tbody>
-              </table>
-            </div>
-
-            <div class="mt-4 flex justify-end">
-              <a href="track.html" class="btn btn-ghost">Open Tracking page</a>
+              <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 text-right">
+                <a href="track.html" class="btn btn-secondary">
+                  View All Shipments
+                </a>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Right column -->
-        <aside class="space-y-6">
-          <div class="bg-white rounded-xl shadow p-4">
-            <div class="flex items-center gap-4">
-              <div
-                class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold"
-              >
-                A
+        <div class="grid-sidebar">
+          <!-- Profile card -->
+          <div class="card animate-slide-up" style="animation-delay: 0.3s">
+            <div class="card-body">
+              <div class="flex items-center space-x-4">
+                <div class="profile-avatar" id="profileAvatar">A</div>
+                <div>
+                  <div
+                    id="profileName"
+                    class="font-semibold text-gray-900 dark:text-white"
+                  >
+                    Loading...
+                  </div>
+                  <div
+                    id="profileEmail"
+                    class="text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    email@example.com
+                  </div>
+                </div>
               </div>
-              <div>
-                <div id="profileName" class="font-semibold">Alice</div>
-                <div id="profileEmail" class="text-sm text-slate-500">
-                  email@example.com
+
+              <div class="mt-6 space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-500 dark:text-gray-400">Phone:</span>
+                  <span
+                    id="profilePhone"
+                    class="font-medium text-gray-900 dark:text-white"
+                    >—</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-500 dark:text-gray-400">Address:</span>
+                  <span
+                    id="profileAddress"
+                    class="font-medium text-gray-900 dark:text-white text-right"
+                    >—</span
+                  >
+                </div>
+              </div>
+
+              <div class="mt-6 flex space-x-3">
+                <a
+                  href="../customer/profile.html"
+                  class="btn btn-secondary flex-1"
+                >
+                  Edit Profile
+                </a>
+                <button id="btnLogout" class="btn btn-danger">
+                  <span class="sr-only">Logout</span>
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick create -->
+          <div class="card animate-slide-up" style="animation-delay: 0.4s">
+            <div class="card-header">
+              <h3 class="card-title">Quick Create</h3>
+            </div>
+            <div class="card-body">
+              <form
+                id="quickCreateForm"
+                class="space-y-4"
+                autocomplete="off"
+                novalidate
+              >
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Recipient Name</label
+                  >
+                  <input
+                    name="recipientName"
+                    class="input"
+                    type="text"
+                    placeholder="Recipient name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Recipient Phone</label
+                  >
+                  <input
+                    name="recipientPhone"
+                    class="input"
+                    type="tel"
+                    placeholder="Recipient phone"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Delivery Address</label
+                  >
+                  <input
+                    name="dropoffAddress"
+                    class="input"
+                    type="text"
+                    placeholder="Delivery address"
+                    required
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      >Weight (kg)</label
+                    >
+                    <input
+                      name="weightKg"
+                      class="input"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="Weight"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="serviceType"
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      >Service Type</label
+                    >
+                    <select id="serviceType" name="serviceType" class="input">
+                      <option value="standard">Standard</option>
+                      <option value="express">Express</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex space-x-3">
+                  <button
+                    id="quickCreateBtn"
+                    class="btn btn-primary flex-1"
+                    type="submit"
+                  >
+                    Create Shipment
+                  </button>
+                  <button
+                    id="quickClearBtn"
+                    type="button"
+                    class="btn btn-secondary"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Notifications -->
+          <div
+            id="notifPreview"
+            class="card animate-slide-up"
+            style="animation-delay: 0.5s"
+          >
+            <div class="card-header flex items-center justify-between">
+              <h4 class="card-title">Notifications</h4>
+              <button
+                id="clearNotifs"
+                class="text-sm text-primary hover:text-primary-700 dark:hover:text-primary-600 transition-colors duration-200"
+              >
+                Clear All
+              </button>
+            </div>
+            <div class="card-body p-0">
+              <div
+                id="notifList"
+                class="divide-y divide-gray-100 dark:divide-gray-700"
+              >
+                <div class="notification-item">
+                  <div class="text-xs text-gray-400 dark:text-gray-500 mb-1">
+                    Just now
+                  </div>
+                  <div class="text-sm">Loading notifications...</div>
                 </div>
               </div>
             </div>
-
-            <div class="mt-4 text-sm text-slate-500 space-y-2">
-              <div>
-                <strong>Phone:</strong> <span id="profilePhone">—</span>
-              </div>
-              <div>
-                <strong>Address:</strong> <span id="profileAddress">—</span>
-              </div>
-            </div>
-
-            <div class="mt-4 flex gap-2">
-              <a href="../customer/profile.html" class="btn btn-sm btn-ghost"
-                >Edit profile</a
-              >
-              <button id="btnLogout" class="btn btn-sm btn-danger">
-                Logout
-              </button>
-            </div>
           </div>
-
-          <div class="bg-white rounded-xl shadow p-4">
-            <h3 class="font-semibold mb-2">Quick create</h3>
-            <form
-              id="quickCreateForm"
-              class="space-y-3"
-              autocomplete="off"
-              novalidate
-            >
-              <input
-                name="recipientName"
-                class="input"
-                type="text"
-                placeholder="Recipient name"
-                required
-              />
-              <input
-                name="recipientPhone"
-                class="input"
-                type="tel"
-                placeholder="Recipient phone"
-                required
-              />
-              <input
-                name="dropoffAddress"
-                class="input"
-                type="text"
-                placeholder="Delivery address"
-                required
-              />
-              <div class="flex gap-2">
-                <input
-                  name="weightKg"
-                  class="input"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  placeholder="Weight (kg)"
-                />
-                <label for="serviceType" class="sr-only">Service Type</label>
-                <select id="serviceType" name="serviceType" class="input">
-                  <option value="standard">Standard</option>
-                  <option value="express">Express</option>
-                </select>
-              </div>
-              <div class="flex items-center gap-2">
-                <button
-                  id="quickCreateBtn"
-                  class="btn btn-primary flex-1"
-                  type="submit"
-                >
-                  Create
-                </button>
-                <button id="quickClearBtn" type="button" class="btn btn-ghost">
-                  Clear
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div id="notifPreview" class="bg-white rounded-xl shadow p-4">
-            <div class="flex items-center justify-between">
-              <h4 class="font-semibold">Notifications</h4>
-              <button
-                id="clearNotifs"
-                class="text-xs text-slate-500 hover:text-slate-700"
-              >
-                Clear
-              </button>
-            </div>
-            <div id="notifList" class="mt-3 text-sm text-slate-500 space-y-2">
-              <div class="text-xs text-slate-400">No notifications</div>
-            </div>
-          </div>
-        </aside>
-      </section>
+        </div>
+      </div>
     </main>
 
-    <!-- INLINE footer -->
-    <footer class="bg-white mt-12">
-      <div class="max-w-7xl mx-auto p-4 text-sm text-slate-500">
-        © <span id="year"></span> GoLanka Courier — Built with ❤️
+    <!-- Footer -->
+    <footer
+      class="bg-white dark:bg-gray-800 mt-12 border-t border-gray-200 dark:border-gray-700"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+          © <span id="year"></span> GoLanka Courier — Built with ❤️ for Sri
+          Lanka
+        </div>
       </div>
     </footer>
 
@@ -356,6 +671,33 @@
       } catch (e) {
         /* ignore */
       }
+
+      // Theme toggle functionality
+      const themeToggle = document.getElementById("theme-toggle");
+      const htmlElement = document.documentElement;
+
+      // Check for saved theme preference or use system preference
+      const savedTheme =
+        localStorage.getItem("theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light");
+
+      // Apply the saved theme
+      if (savedTheme === "dark") {
+        htmlElement.classList.add("dark");
+      } else {
+        htmlElement.classList.remove("dark");
+      }
+
+      // Toggle theme on button click
+      themeToggle.addEventListener("click", function () {
+        htmlElement.classList.toggle("dark");
+
+        // Save preference
+        const isDark = htmlElement.classList.contains("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
     </script>
 
     <!-- Page logic (defensive) -->
@@ -594,24 +936,31 @@
             ? new Date(p.createdAt).toLocaleString()
             : p.created || "-";
 
+          let statusClass = "status-active";
+          if (status.toLowerCase().includes("pending"))
+            statusClass = "status-pending";
+          if (status.toLowerCase().includes("deliver"))
+            statusClass = "status-delivered";
+          if (status.toLowerCase().includes("cancel"))
+            statusClass = "status-cancelled";
+
           const $tr = $(`
-            <tr class="hover:bg-slate-50">
-              <td class="py-2 px-3 align-top">
-                <div class="font-mono text-sm">${escapeHtml(tracking)}</div>
-                <div class="text-xs text-slate-400">${escapeHtml(
-                  p.id ? "ID:" + p.id : ""
-                )}</div>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200">
+              <td class="table-cell font-mono">${escapeHtml(tracking)}</td>
+              <td class="table-cell">${escapeHtml(recipient)}</td>
+              <td class="table-cell">
+                <span class="status-badge ${statusClass}">${escapeHtml(
+            status
+          )}</span>
               </td>
-              <td class="py-2 px-3">${escapeHtml(recipient)}</td>
-              <td class="py-2 px-3">${escapeHtml(status)}</td>
-              <td class="py-2 px-3">${escapeHtml(created)}</td>
-              <td class="py-2 px-3">${escapeHtml(p.serviceType || "-")}</td>
-              <td class="py-2 px-3 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <button class="btn btn-xs btn-ghost btn-track" data-code="${escapeHtml(
+              <td class="table-cell">${escapeHtml(created)}</td>
+              <td class="table-cell">${escapeHtml(p.serviceType || "-")}</td>
+              <td class="table-cell text-right">
+                <div class="flex items-center justify-end space-x-2">
+                  <button class="btn btn-xs btn-secondary btn-track" data-code="${escapeHtml(
                     tracking
                   )}">Track</button>
-                  <button class="btn btn-xs btn-outline btn-view" data-id="${
+                  <button class="btn btn-xs btn-primary btn-view" data-id="${
                     p.id || ""
                   }">View</button>
                 </div>
@@ -653,6 +1002,10 @@
               $("#profileAddress").text(
                 json.profile.address || json.profile.addressLine || "—"
               );
+
+              // Set profile avatar initial
+              const name = json.profile.name || json.profile.fullName || "C";
+              $("#profileAvatar").text(name.charAt(0).toUpperCase());
             }
             if (json && json.metrics) {
               $("#metricActive").text(json.metrics.active ?? "0");
@@ -690,11 +1043,17 @@
         // Refresh recent shipments
         async function refreshRecent() {
           const $tbody = $("#recentTableBody");
-          $tbody
-            .empty()
-            .append(
-              `<tr><td class="p-4 text-sm text-slate-400" colspan="6">Loading…</td></tr>`
-            );
+          $tbody.empty().append(
+            `<tr><td class="px-6 py-8 text-center text-gray-500 dark:text-gray-400" colspan="6">
+                <div class="flex justify-center">
+                  <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+                <p class="mt-4">Loading shipments...</p>
+              </td></tr>`
+          );
           try {
             const list =
               (await Api.apiJson(`/api/parcels?limit=${recentLimit}`, {
@@ -703,7 +1062,7 @@
             $tbody.empty();
             if (!list.length) {
               $tbody.append(
-                `<tr><td class="p-4 text-sm text-slate-500" colspan="6">No recent shipments.</td></tr>`
+                `<tr><td class="px-6 py-8 text-center text-gray-500 dark:text-gray-400" colspan="6">No recent shipments.</td></tr>`
               );
               return;
             }
@@ -713,7 +1072,7 @@
               $tbody
                 .empty()
                 .append(
-                  `<tr><td class="p-4 text-sm text-red-500" colspan="6">Server error while fetching parcels (500). Check backend logs.</td></tr>`
+                  `<tr><td class="px-6 py-8 text-center text-red-500 dark:text-red-400" colspan="6">Server error while fetching parcels (500). Check backend logs.</td></tr>`
                 );
             } else if (err && err.status === 401) {
               window.location.href = "/pages/auth/signin.html";
@@ -721,7 +1080,7 @@
               $tbody
                 .empty()
                 .append(
-                  `<tr><td class="p-4 text-sm text-red-500" colspan="6">Failed to load recent shipments: ${escapeHtml(
+                  `<tr><td class="px-6 py-8 text-center text-red-500 dark:text-red-400" colspan="6">Failed to load recent shipments: ${escapeHtml(
                     err?.message || err?.body?.message || ""
                   )}</td></tr>`
                 );
@@ -735,7 +1094,9 @@
           $list.empty();
           if (!list || !list.length) {
             $list.append(
-              `<div class="text-xs text-slate-400">No notifications</div>`
+              `<div class="notification-item">
+                <div class="text-sm text-gray-500 dark:text-gray-400">No notifications</div>
+              </div>`
             );
             return;
           }
@@ -744,11 +1105,14 @@
               ? new Date(n.timestamp).toLocaleString()
               : "";
             $list.append(
-              `<div class="p-2 rounded border bg-white"><div class="text-xs text-slate-400">${escapeHtml(
-                time
-              )}</div><div class="text-sm">${escapeHtml(
-                n.title || n.message || "Notification"
-              )}</div></div>`
+              `<div class="notification-item">
+                <div class="text-xs text-gray-400 dark:text-gray-500 mb-1">${escapeHtml(
+                  time
+                )}</div>
+                <div class="text-sm">${escapeHtml(
+                  n.title || n.message || "Notification"
+                )}</div>
+              </div>`
             );
           });
         }
@@ -777,7 +1141,7 @@
               title: "Validation",
               html: missing.join("<br/>"),
             });
-            $btn.prop("disabled", false).text("Create");
+            $btn.prop("disabled", false).text("Create Shipment");
             return;
           }
 
@@ -799,7 +1163,7 @@
               text: err?.body?.message || err.message || "Request failed",
             });
           } finally {
-            $btn.prop("disabled", false).text("Create");
+            $btn.prop("disabled", false).text("Create Shipment");
           }
         });
 
@@ -849,6 +1213,11 @@
             $("html,body").animate({ scrollTop: form.offset().top - 80 }, 300);
             form.find('[name="recipientName"]').focus();
           }
+        });
+
+        // Clear form button
+        $("#quickClearBtn").on("click", function () {
+          $("#quickCreateForm")[0].reset();
         });
 
         // Initial load

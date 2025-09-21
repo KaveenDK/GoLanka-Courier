@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="679485e4-530c-449b-9133-10023b47a5d3" name="Changes" comment="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings." />
+    <list default="true" id="679485e4-530c-449b-9133-10023b47a5d3" name="Changes" comment="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/pages/auth/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/pages/auth/signup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/pages/customer/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/pages/customer/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -106,7 +111,7 @@
       <option name="presentableId" value="Default" />
       <updated>1758437071692</updated>
       <workItem from="1758437073625" duration="138000" />
-      <workItem from="1758437313326" duration="20585000" />
+      <workItem from="1758437313326" duration="24916000" />
     </task>
     <task id="LOCAL-00001" summary="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings.">
       <option name="closed" value="true" />

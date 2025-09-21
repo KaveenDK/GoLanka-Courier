@@ -20,21 +20,35 @@
     <link rel="stylesheet" href="../../css/animations.css" />
 
     <script>
-      // Helpful page-level config (override if needed)
       window.COMPONENTS_BASE = "../../";
       window.API_BASE = window.API_BASE || "http://localhost:8080";
     </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .input {
+        @apply w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 transition-all duration-300;
+      }
+      .is-invalid {
+        @apply border-red-500;
+      }
+      .field-error {
+        @apply text-xs text-red-500 mt-1 hidden;
+      }
+    </style>
   </head>
 
   <body
-    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4"
+    class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 min-h-screen flex items-center justify-center p-2 sm:p-4"
   >
     <main
-      class="max-w-3xl w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden"
+      class="w-full max-w-4xl bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden animate-fade-in"
     >
-      <div class="md:flex">
+      <div class="flex flex-col md:flex-row">
+        <!-- Left Side (Info) -->
         <section
-          class="hidden md:block md:w-1/2 bg-gradient-to-br from-indigo-600 to-indigo-400 p-8"
+          class="hidden md:flex md:w-1/2 bg-gradient-to-br from-indigo-600 to-indigo-400 p-8 flex-col justify-center"
         >
           <div class="text-white">
             <h1 class="text-3xl font-extrabold mb-2">Welcome to GoLanka</h1>
@@ -50,8 +64,14 @@
           </div>
         </section>
 
-        <section class="w-full md:w-1/2 p-8">
-          <header class="mb-6">
+        <!-- Right Side (Form) -->
+        <section class="w-full md:w-1/2 p-4 sm:p-8">
+          <header class="mb-6 text-center">
+            <img
+              src="../../assets/images/logo.png"
+              alt="GoLanka Courier"
+              class="w-14 h-14 mx-auto rounded-full shadow mb-2"
+            />
             <h2 class="text-2xl font-bold">Create an account</h2>
             <p class="text-sm text-slate-500 mt-1">
               Choose Customer (instant) or Driver (request submission).
@@ -62,7 +82,9 @@
             <div class="grid grid-cols-1 gap-3">
               <fieldset class="mb-2">
                 <legend class="text-sm font-medium mb-2">Account type</legend>
-                <div class="flex items-center gap-4">
+                <div
+                  class="flex flex-col xs:flex-row sm:flex-row items-start sm:items-center gap-2 sm:gap-4"
+                >
                   <label class="inline-flex items-center gap-2">
                     <input
                       type="radio"
@@ -85,13 +107,10 @@
                   required
                   name="fullName"
                   type="text"
-                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  class="input mt-1"
                   placeholder="Alice Perera"
                 />
-                <p
-                  class="text-xs text-red-500 mt-1 hidden field-error"
-                  data-field="fullName"
-                ></p>
+                <p class="field-error" data-field="fullName"></p>
               </label>
 
               <label class="block">
@@ -100,16 +119,13 @@
                   required
                   name="email"
                   type="email"
-                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  class="input mt-1"
                   placeholder="alice@example.com"
                 />
-                <p
-                  class="text-xs text-red-500 mt-1 hidden field-error"
-                  data-field="email"
-                ></p>
+                <p class="field-error" data-field="email"></p>
               </label>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="block">
                   <span class="text-sm font-medium">Password</span>
                   <input
@@ -117,15 +133,11 @@
                     name="password"
                     type="password"
                     minlength="8"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="At least 8 characters"
                   />
-                  <p
-                    class="text-xs text-red-500 mt-1 hidden field-error"
-                    data-field="password"
-                  ></p>
+                  <p class="field-error" data-field="password"></p>
                 </label>
-
                 <label class="block">
                   <span class="text-sm font-medium">Confirm password</span>
                   <input
@@ -133,13 +145,10 @@
                     name="confirmPassword"
                     type="password"
                     minlength="8"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="Confirm password"
                   />
-                  <p
-                    class="text-xs text-red-500 mt-1 hidden field-error"
-                    data-field="confirmPassword"
-                  ></p>
+                  <p class="field-error" data-field="confirmPassword"></p>
                 </label>
               </div>
 
@@ -148,13 +157,10 @@
                 <input
                   name="phone"
                   type="tel"
-                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  class="input mt-1"
                   placeholder="+94771234567"
                 />
-                <p
-                  class="text-xs text-red-500 mt-1 hidden field-error"
-                  data-field="phone"
-                ></p>
+                <p class="field-error" data-field="phone"></p>
               </label>
 
               <label class="block">
@@ -162,13 +168,10 @@
                 <input
                   name="address"
                   type="text"
-                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  class="input mt-1"
                   placeholder="No 12, Baker Street, Colombo"
                 />
-                <p
-                  class="text-xs text-red-500 mt-1 hidden field-error"
-                  data-field="address"
-                ></p>
+                <p class="field-error" data-field="address"></p>
               </label>
 
               <label class="block">
@@ -176,18 +179,18 @@
                 <input
                   name="addressLine"
                   type="text"
-                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  class="input mt-1"
                   placeholder="No 12, Baker Street"
                 />
               </label>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="block">
                   <span class="text-sm font-medium">City</span>
                   <input
                     name="city"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="Colombo"
                   />
                 </label>
@@ -196,19 +199,19 @@
                   <input
                     name="province"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="Western"
                   />
                 </label>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="block">
                   <span class="text-sm font-medium">Country</span>
                   <input
                     name="country"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="Sri Lanka"
                     value="Sri Lanka"
                   />
@@ -218,20 +221,20 @@
                   <input
                     name="postalCode"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="10000"
                   />
                 </label>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="block">
                   <span class="text-sm font-medium">Latitude</span>
                   <input
                     name="latitude"
                     type="number"
                     step="any"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="6.927079"
                   />
                 </label>
@@ -241,7 +244,7 @@
                     name="longitude"
                     type="number"
                     step="any"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="79.861244"
                   />
                 </label>
@@ -261,13 +264,10 @@
                   <input
                     name="nic"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="#########V"
                   />
-                  <p
-                    class="text-xs text-red-500 mt-1 hidden field-error"
-                    data-field="nic"
-                  ></p>
+                  <p class="field-error" data-field="nic"></p>
                 </label>
 
                 <label class="block">
@@ -275,13 +275,10 @@
                   <input
                     name="licenseNumber"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="DL-123456"
                   />
-                  <p
-                    class="text-xs text-red-500 mt-1 hidden field-error"
-                    data-field="licenseNumber"
-                  ></p>
+                  <p class="field-error" data-field="licenseNumber"></p>
                 </label>
 
                 <label class="block">
@@ -289,13 +286,10 @@
                   <input
                     name="vehicleNumber"
                     type="text"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="WP-ABC-1234"
                   />
-                  <p
-                    class="text-xs text-red-500 mt-1 hidden field-error"
-                    data-field="vehicleNumber"
-                  ></p>
+                  <p class="field-error" data-field="vehicleNumber"></p>
                 </label>
 
                 <label class="block">
@@ -303,26 +297,30 @@
                   <textarea
                     name="driverNote"
                     rows="2"
-                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    class="input mt-1"
                     placeholder="Any additional info for your driver request"
                   ></textarea>
                 </label>
               </div>
             </div>
 
-            <div class="flex items-center justify-between gap-4">
+            <div
+              class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6"
+            >
               <button
                 id="signupBtn"
                 type="submit"
-                class="w-full inline-flex items-center justify-center rounded-md bg-indigo-600 text-white px-4 py-2 font-medium"
+                class="w-full btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg px-4 py-3 shadow-md hover:shadow-lg transition-all duration-300"
               >
                 Create account / Submit request
               </button>
             </div>
 
-            <p class="text-sm text-slate-500">
+            <p class="text-center text-sm text-slate-500 mt-4">
               Already registered?
-              <a href="signin.html" class="text-indigo-600 underline"
+              <a
+                href="signin.html"
+                class="text-indigo-600 underline font-medium"
                 >Sign in</a
               >
             </p>
