@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign in — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind config for custom colors & dark mode via class
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: "#0ea5a4", 700: "#089e9b" },
+              accent: { DEFAULT: "#ffb020" },
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-out",
+              "slide-up": "slideUp 0.5s ease-out",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(10px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .input {
+        @apply w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 transition-all duration-300;
+      }
+
+      .btn {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-3 font-medium transition-all duration-300;
+      }
+
+      .btn-primary {
+        @apply bg-primary hover:bg-primary-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+      }
+
+      .btn-ghost {
+        @apply bg-transparent border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700;
+      }
+
+      .theme-toggle {
+        @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-200 transition-all duration-300;
+      }
+
+      .theme-toggle:hover {
+        @apply bg-gray-300 dark:bg-gray-600;
+      }
+
+      .card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden;
+      }
+
+      .logo-text {
+        background: linear-gradient(135deg, #0ea5a4 0%, #089e9b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .form-group {
+        @apply mb-5;
+      }
+
+      .form-label {
+        @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+      }
+
+      .checkbox-label {
+        @apply inline-flex items-center text-sm text-gray-600 dark:text-gray-400;
+      }
+
+      .link {
+        @apply text-primary hover:text-primary-700 transition-colors duration-300;
+      }
+
+      .divider {
+        @apply flex items-center my-6;
+      }
+
+      .divider::before,
+      .divider::after {
+        @apply flex-1 h-px bg-gray-300 dark:bg-gray-600;
+      }
+
+      .divider-text {
+        @apply px-3 text-sm text-gray-500 dark:text-gray-400;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300"
+  >
+    <!-- Theme toggle button -->
+    <button
+      id="theme-toggle"
+      class="theme-toggle fixed top-4 right-4 z-10"
+      aria-label="Toggle dark mode"
+    >
+      <svg
+        class="w-5 h-5 hidden dark:block"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+        ></path>
+      </svg>
+      <svg
+        class="w-5 h-5 block dark:hidden"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+
+    <main class="w-full max-w-md animate-fade-in">
+      <div class="card p-8 shadow-xl">
+        <div class="text-center mb-8">
+          <div class="flex justify-center mb-4">
+            <div
+              class="w-16 h-16 bg-primary rounded-full flex items-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+          </div>
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            Welcome back
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Sign in to your GoLanka Courier account
+          </p>
+        </div>
+
+        <form id="signinForm" class="space-y-6" novalidate>
+          <div
+            class="form-group animate-slide-up"
+            style="animation-delay: 0.1s"
+          >
+            <label class="form-label">Email</label>
+            <input
+              required
+              name="email"
+              type="email"
+              class="input"
+              placeholder="alice@example.com"
+              autocomplete="email"
+            />
+            <p
+              class="text-xs text-red-500 mt-1 hidden field-error"
+              data-field="email"
+            ></p>
+          </div>
+
+          <div
+            class="form-group animate-slide-up"
+            style="animation-delay: 0.2s"
+          >
+            <label class="form-label">Password</label>
+            <input
+              required
+              name="password"
+              type="password"
+              class="input"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <p
+              class="text-xs text-red-500 mt-1 hidden field-error"
+              data-field="password"
+            ></p>
+          </div>
+
+          <div
+            class="flex items-center justify-between animate-slide-up"
+            style="animation-delay: 0.3s"
+          >
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                class="rounded text-primary focus:ring-primary border-gray-300 dark:border-gray-600 mr-2"
+              />
+              Remember me
+            </label>
+            <a href="forgot-password.html" class="text-sm link"
+              >Forgot password?</a
+            >
+          </div>
+
+          <button
+            id="signinBtn"
+            type="submit"
+            class="w-full btn btn-primary animate-slide-up"
+            style="animation-delay: 0.4s"
+          >
+            <span id="btn-text">Sign in</span>
+            <svg
+              id="btn-spinner"
+              class="hidden w-5 h-5 text-white animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </button>
+
+          <div class="animate-slide-up" style="animation-delay: 0.5s">
+            <div class="divider">
+              <span class="divider-text">Or continue with</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <button type="button" class="btn btn-ghost">
+                <svg
+                  class="w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                  />
+                </svg>
+                GitHub
+              </button>
+              <button type="button" class="btn btn-ghost">
+                <svg
+                  class="w-5 h-5 mr-2"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 6.627 5.374 12 12 12 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12zm-2.033 16.01c.564-1.789 1.632-3.932 1.821-4.474.273-.787-.211-1.136-1.74.209l-.34-.64c1.744-1.897 5.335-2.326 4.113.613-.432 1.003-.696 2.515-1.323 4.141.387.308.78.611 1.179.907-.603.5-1.46.949-2.5 1.314-.829-.937-1.425-2.015-1.81-3.076zm3.779.02c-.238.868-.522 1.773-.846 2.644-.974-.307-2.356-.922-3.06-1.821.503-.392.962-.804 1.382-1.236.216.723.448 1.514.693 2.325.308-.031.62-.047.935-.047.317 0 .633.016.943.048.241-.81.469-1.6.684-2.321.427.439.892.857 1.401 1.253-.709.895-2.102 1.509-3.082 1.816-.321-.866-.602-1.767-.84-2.641z"
+                  />
+                </svg>
+                Google
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="text-center text-sm text-gray-600 dark:text-gray-400 animate-slide-up"
+            style="animation-delay: 0.6s"
+          >
+            Don't have an account?
+            <a href="signup.html" class="link font-medium">Create one</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="text-center mt-6 text-xs text-gray-500 dark:text-gray-500">
+        © 2023 GoLanka Courier. All rights reserved.
+      </div>
+    </main>
+
+    <!-- IMPORTANT: set API base BEFORE loading script.js so the helper uses correct host -->
+    <script>
+      // point to your backend (adjust if different)
+      window.API_BASE = "http://localhost:8080";
+      // optional override for signin redirect
+      window.SIGNIN_PAGE = "/pages/auth/signin.html";
+      console.info("API_BASE set to", window.API_BASE);
+    </script>
+
+    <!-- main helpers (optional) -->
+    <script src="../../js/main.js"></script>
+
+    <!-- core API helper (must expose window.GoLankaApi). Replace with the improved script.js you have. -->
+    <script src="../../js/script.js"></script>
+
+    <!-- notifications/auth helpers (optional) -->
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/auth.js"></script>
+
+    <script>
+      (function ($, Swal, Api) {
+        "use strict";
+        const form = $("#signinForm");
+        const btn = $("#signinBtn");
+        const btnText = $("#btn-text");
+        const btnSpinner = $("#btn-spinner");
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById("theme-toggle");
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference or use system preference
+        const savedTheme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+
+        // Apply the saved theme
+        if (savedTheme === "dark") {
+          htmlElement.classList.add("dark");
+        } else {
+          htmlElement.classList.remove("dark");
+        }
+
+        // Toggle theme on button click
+        themeToggle.addEventListener("click", function () {
+          htmlElement.classList.toggle("dark");
+
+          // Save preference
+          const isDark = htmlElement.classList.contains("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+
+        function showFieldError(field, msg) {
+          const $el = $(`.field-error[data-field="${field}"]`);
+          if ($el.length) {
+            $el.removeClass("hidden").text(msg);
+            // Add animation to highlight error
+            $el.parent().find(".input").addClass("border-red-500 shake");
+            setTimeout(() => {
+              $el.parent().find(".input").removeClass("shake");
+            }, 500);
+          } else {
+            // fallback toast
+            if (window.GoLankaApi && GoLankaApi.toast)
+              GoLankaApi.toast({ title: msg, icon: "error" });
+            else console.warn("Field error:", field, msg);
+          }
+        }
+
+        function clearFieldErrors() {
+          $(".field-error").each(function () {
+            $(this).addClass("hidden").text("");
+            $(this).parent().find(".input").removeClass("border-red-500");
+          });
+        }
+
+        // fallback apiPostJson if GoLankaApi missing (tries a robust fetch to API_BASE)
+        async function fallbackApiPostJson(path, body) {
+          const base = (window.API_BASE || "").replace(/\/$/, "");
+          const url = path.startsWith("http")
+            ? path
+            : path.startsWith("/")
+            ? base + path
+            : base + "/" + path;
+          const res = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(body),
+            credentials: "include",
+          });
+          const text = await res.text().catch(() => "");
+          let json = null;
+          try {
+            json = text ? JSON.parse(text) : null;
+          } catch (e) {
+            json = null;
+          }
+          if (!res.ok) throw { status: res.status, body: json || text || null };
+          return json;
+        }
+
+        async function apiPostJson(path, body) {
+          if (
+            window.GoLankaApi &&
+            typeof window.GoLankaApi.login === "function" &&
+            path === "/api/auth/login"
+          ) {
+            // prefer using the high-level login helper (handles tokens/refresh)
+            return window.GoLankaApi.login(body.email, body.password);
+          }
+          if (
+            window.GoLankaApi &&
+            typeof window.GoLankaApi.apiJson === "function"
+          ) {
+            return window.GoLankaApi.apiJson(path, { method: "POST", body });
+          }
+          return fallbackApiPostJson(path, body);
+        }
+
+        form.on("submit", async function (e) {
+          e.preventDefault();
+          clearFieldErrors();
+          btn.prop("disabled", true);
+          btnText.text("Signing in...");
+          btnSpinner.removeClass("hidden");
+
+          const payload = {
+            email: form.find('[name="email"]').val()?.trim(),
+            password: form.find('[name="password"]').val(),
+          };
+
+          if (!payload.email || !payload.password) {
+            if (!payload.email) showFieldError("email", "Email is required");
+            if (!payload.password)
+              showFieldError("password", "Password is required");
+            btn.prop("disabled", false);
+            btnText.text("Sign in");
+            btnSpinner.addClass("hidden");
+            return;
+          }
+
+          try {
+            // call API login (this function will throw on non-2xx with helpful error object)
+            const resp = await apiPostJson("/api/auth/login", payload);
+
+            // If login helper returned token info, it already stored tokens. If not, treat as success if resp.ok-ish.
+            console.info("Login response:", resp);
+
+            // Roles may be returned in resp.roles or in decoded token
+            let roles = resp && resp.roles ? resp.roles : null;
+            if (
+              !roles &&
+              window.GoLankaApi &&
+              typeof window.GoLankaApi.getUser === "function"
+            ) {
+              const user = GoLankaApi.getUser();
+              roles = (user && user.roles) || null;
+            }
+
+            // friendly success message
+            await Swal.fire({
+              icon: "success",
+              title: "Signed in",
+              text: "Redirecting to dashboard...",
+              timer: 1200,
+              showConfirmButton: false,
+            });
+
+            // Basic role-based redirect (safe fallbacks)
+            roles = Array.isArray(roles) ? roles : roles ? [roles] : [];
+            if (roles.includes("ROLE_ADMIN")) {
+              window.location.href = "/pages/admin/dashboard.html";
+            } else if (roles.includes("ROLE_STAFF")) {
+              window.location.href = "/pages/staff/dashboard.html";
+            } else if (roles.includes("ROLE_DRIVER")) {
+              window.location.href = "/pages/driver/dashboard.html";
+            } else {
+              // default customer dashboard
+              window.location.href = "/pages/customer/dashboard.html";
+            }
+          } catch (err) {
+            console.error("Login error", err);
+            // handle structured error thrown by Api.apiJson or fallback fetch
+            if (err && (err.body || err.status)) {
+              // if validation errors array present
+              const body = err.body || null;
+              if (body && Array.isArray(body.validationErrors)) {
+                body.validationErrors.forEach((e) =>
+                  showFieldError(e.field, e.message)
+                );
+                await Swal.fire(
+                  "Validation error",
+                  "Fix the form errors and retry",
+                  "error"
+                );
+              } else if (body && body.message) {
+                await Swal.fire("Error", body.message, "error");
+              } else {
+                // fallback textual message if available
+                const rawMsg =
+                  err.raw || (typeof err.body === "string" ? err.body : null);
+                await Swal.fire(
+                  "Error",
+                  rawMsg || "Login failed. Check credentials and try again.",
+                  "error"
+                );
+              }
+            } else if (err && err.message) {
+              await Swal.fire("Error", err.message, "error");
+            } else {
+              await Swal.fire(
+                "Error",
+                "Login failed. Check credentials and try again.",
+                "error"
+              );
+            }
+          } finally {
+            btn.prop("disabled", false);
+            btnText.text("Sign in");
+            btnSpinner.addClass("hidden");
+          }
+        });
+      })(window.jQuery, window.Swal, window.GoLankaApi);
+    </script>
+  </body>
+</html>

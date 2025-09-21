@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Reports — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind (dev CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header -->
+    <div id="header-placeholder" role="banner"></div>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Admin — Reports</h1>
+          <p class="text-sm text-slate-500">
+            View business metrics, export data and inspect trends.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="exportCsvBtn" class="btn btn-ghost">Export CSV</button>
+          <button id="refreshBtn" class="btn btn-ghost">Refresh</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 mb-6">
+        <form
+          id="filtersForm"
+          class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end"
+        >
+          <div>
+            <label class="text-xs text-slate-500">From</label>
+            <input
+              id="fromDate"
+              type="date"
+              class="input w-full"
+              placeholder="Select start date"
+              title="From date"
+            />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">To</label>
+            <input
+              id="toDate"
+              type="date"
+              class="input w-full"
+              placeholder="Select end date"
+              title="To date"
+            />
+          </div>
+          <div>
+            <label for="reportType" class="text-xs text-slate-500"
+              >Report Type</label
+            >
+            <select id="reportType" class="input w-full" title="Report Type">
+              <option value="daily">Daily — shipments</option>
+              <option value="weekly">Weekly — shipments</option>
+              <option value="revenue">Revenue</option>
+              <option value="driver-performance">Driver Performance</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary w-full">
+              Generate
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Overview cards -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Total Shipments</div>
+          <div id="cardShipments" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Within selected range</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Revenue (LKR)</div>
+          <div id="cardRevenue" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Approximate</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Active Drivers</div>
+          <div id="cardDrivers" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Online right now</div>
+        </div>
+      </section>
+
+      <!-- Charts + tables -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl shadow p-4"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold">Shipments Trend</h2>
+            <div class="text-sm text-slate-500">Breakdown by day</div>
+          </div>
+          <canvas
+            id="shipmentsChart"
+            class="w-full"
+            height="160"
+            role="img"
+            aria-label="Shipments trend chart"
+          ></canvas>
+        </div>
+
+        <aside class="space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Top Routes</h4>
+            <ol
+              id="topRoutes"
+              class="mt-3 text-sm text-slate-600 dark:text-slate-300 list-decimal ml-5"
+            >
+              <li class="text-xs text-slate-400">Loading…</li>
+            </ol>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Quick exports</h4>
+            <div class="mt-3 space-y-2">
+              <button id="exportShipmentsBtn" class="btn btn-ghost w-full">
+                Export Shipments CSV
+              </button>
+              <button id="exportRevenueBtn" class="btn btn-ghost w-full">
+                Export Revenue CSV
+              </button>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <!-- Raw data table -->
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 mt-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold">Report data</h3>
+          <div class="text-sm text-slate-500">
+            Showing rows for selected range
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table id="reportTable" class="min-w-full text-left">
+            <thead>
+              <tr class="text-xs text-slate-500 border-b">
+                <th class="py-2 px-3">Date</th>
+                <th class="py-2 px-3">Tracking</th>
+                <th class="py-2 px-3">Status</th>
+                <th class="py-2 px-3">Route</th>
+                <th class="py-2 px-3">Driver</th>
+                <th class="py-2 px-3">Fee (LKR)</th>
+              </tr>
+            </thead>
+            <tbody id="reportTbody" class="divide-y">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-sm text-slate-400">
+                  Generate a report to see rows.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <div id="footer-placeholder" role="contentinfo"></div>
+
+    <!-- Core helpers -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/admin.js"></script>
+
+    <!-- Page script (inline for convenience) -->
+    <script>
+      (function ($, Swal, Chart) {
+        function safeParse(t) {
+          try {
+            return t ? JSON.parse(t) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        function formatNumber(n) {
+          return new Intl.NumberFormat().format(n || 0);
+        }
+
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+
+        // Chart instance
+        let shipmentsChart = null;
+
+        function initChart(labels = [], data = []) {
+          const ctx = document
+            .getElementById("shipmentsChart")
+            .getContext("2d");
+          if (shipmentsChart) {
+            shipmentsChart.destroy();
+            shipmentsChart = null;
+          }
+          shipmentsChart = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Shipments",
+                  data: data,
+                  tension: 0.3,
+                  fill: true,
+                  borderWidth: 2,
+                  pointRadius: 3,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true },
+              },
+            },
+          });
+        }
+
+        async function fetchReport(params) {
+          $("#reportTbody").html(
+            '<tr><td colspan="6" class="p-6 text-center text-sm text-slate-400">Loading…</td></tr>'
+          );
+          try {
+            const qs = new URLSearchParams(params || {}).toString();
+            const res = await fetch("/api/admin/reports?" + qs, {
+              credentials: "include",
+            });
+            const text = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(text) && safeParse(text).message) ||
+                  "Failed to fetch report"
+              );
+            const json = safeParse(text) || {};
+            // update cards
+            $("#cardShipments").text(formatNumber(json.totalShipments));
+            $("#cardRevenue").text(formatNumber(json.totalRevenue));
+            $("#cardDrivers").text(formatNumber(json.activeDrivers));
+            // update top routes
+            $("#topRoutes").empty();
+            (json.topRoutes || []).slice(0, 5).forEach((r) => {
+              $("#topRoutes").append(
+                `<li>${r.route} — ${r.count} shipments</li>`
+              );
+            });
+            if (!(json.topRoutes || []).length)
+              $("#topRoutes").append(
+                '<li class="text-xs text-slate-400">No data</li>'
+              );
+
+            // update chart
+            const labels = json.series?.map((s) => s.label) || [];
+            const data = json.series?.map((s) => s.value) || [];
+            initChart(labels, data);
+
+            // update table
+            const rows = json.rows || [];
+            const $tb = $("#reportTbody").empty();
+            if (!rows.length) {
+              $tb.append(
+                '<tr><td colspan="6" class="p-6 text-center text-sm text-slate-400">No rows</td></tr>'
+              );
+            } else {
+              rows.forEach((r) => {
+                $tb.append(`
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                  <td class="py-2 px-3 text-sm">${r.date || ""}</td>
+                  <td class="py-2 px-3 font-mono">${r.tracking || ""}</td>
+                  <td class="py-2 px-3">${r.status || ""}</td>
+                  <td class="py-2 px-3">${r.route || ""}</td>
+                  <td class="py-2 px-3">${r.driver || ""}</td>
+                  <td class="py-2 px-3">${
+                    r.fee != null ? formatNumber(r.fee) : ""
+                  }</td>
+                </tr>
+              `);
+              });
+            }
+          } catch (err) {
+            $("#reportTbody").html(
+              '<tr><td colspan="6" class="p-6 text-center text-sm text-red-500">Failed to load report</td></tr>'
+            );
+            console.error(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        }
+
+        // Export helpers (calls backend endpoints which should stream CSV or return CSV string)
+        async function exportCsv(type) {
+          try {
+            Swal.showLoading();
+            const res = await fetch(
+              `/api/admin/reports/export?type=${encodeURIComponent(type)}&` +
+                new URLSearchParams({
+                  from: $("#fromDate").val() || "",
+                  to: $("#toDate").val() || "",
+                }),
+              { credentials: "include" }
+            );
+            const text = await res.text();
+            if (!res.ok) throw new Error(text || "Export failed");
+            // create downloadable blob
+            const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `golanka-report-${type}-${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            Swal.close();
+          } catch (err) {
+            Swal.close();
+            Swal.fire({
+              icon: "error",
+              title: "Export failed",
+              text: err.message || "",
+            });
+          }
+        }
+
+        // handlers
+        $("#filtersForm").on("submit", function (e) {
+          e.preventDefault();
+          const params = {
+            from: $("#fromDate").val() || "",
+            to: $("#toDate").val() || "",
+            type: $("#reportType").val(),
+          };
+          fetchReport(params);
+        });
+
+        $("#refreshBtn").on("click", function () {
+          $("#filtersForm").trigger("submit");
+        });
+        $("#exportCsvBtn").on("click", function () {
+          exportCsv($("#reportType").val() || "daily");
+        });
+        $("#exportShipmentsBtn").on("click", function () {
+          exportCsv("shipments");
+        });
+        $("#exportRevenueBtn").on("click", function () {
+          exportCsv("revenue");
+        });
+
+        // initial quick load (last 7 days)
+        $(function () {
+          const to = new Date();
+          const from = new Date();
+          from.setDate(to.getDate() - 7);
+          $("#toDate").val(to.toISOString().slice(0, 10));
+          $("#fromDate").val(from.toISOString().slice(0, 10));
+          $("#reportType").val("daily");
+          $("#filtersForm").trigger("submit");
+        });
+      })(window.jQuery, window.Swal, window.Chart);
+    </script>
+  </body>
+</html>

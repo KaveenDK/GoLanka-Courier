@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Staff Dashboard — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN (dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header (loaded from components) -->
+    <div id="header-placeholder" role="banner"></div>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <div class="flex items-start justify-between gap-6 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Staff Console</h1>
+          <p class="text-sm text-slate-500">
+            Manage parcels, assign drivers, and monitor pickups.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="refreshBtn" class="btn btn-ghost">Refresh</button>
+          <button id="bulkAssignBtn" class="btn btn-primary" disabled>
+            Bulk Assign
+          </button>
+          <button id="exportBtn" class="btn btn-ghost">Export CSV</button>
+        </div>
+      </div>
+
+      <!-- top metrics -->
+      <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Pending Pickups</div>
+          <div id="metricPending" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">
+            Requires pickup by drivers
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Unassigned Parcels</div>
+          <div id="metricUnassigned" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Waiting for assignment</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">In Transit</div>
+          <div id="metricInTransit" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">
+            Currently being delivered
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Issues / Exceptions</div>
+          <div id="metricIssues" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">
+            Requires staff attention
+          </div>
+        </div>
+      </section>
+
+      <!-- filters + search -->
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 mb-6">
+        <form
+          id="filterForm"
+          class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end"
+        >
+          <div>
+            <label class="text-sm text-slate-500 block mb-1">Status</label>
+            <select id="filterStatus" class="input" title="Status">
+              <option value="">Any</option>
+              <option value="PENDING_PICKUP">Pending pickup</option>
+              <option value="UNASSIGNED">Unassigned</option>
+              <option value="IN_TRANSIT">In transit</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="EXCEPTION">Exception</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filterDriver" class="text-sm text-slate-500 block mb-1"
+              >Driver</label
+            >
+            <select id="filterDriver" class="input">
+              <option value="">Any</option>
+              <!-- populated dynamically -->
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-500 block mb-1">Date range</label>
+            <div class="flex gap-2">
+              <input
+                id="filterFrom"
+                type="date"
+                class="input"
+                title="From date"
+                placeholder="From"
+              />
+              <input
+                id="filterTo"
+                type="date"
+                class="input"
+                title="To date"
+                placeholder="To"
+              />
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <div class="flex-1">
+              <label class="text-sm text-slate-500 block mb-1">Search</label>
+              <input
+                id="filterSearch"
+                type="search"
+                class="input"
+                placeholder="Tracking id, recipient, phone"
+              />
+            </div>
+            <div>
+              <button id="applyFilter" class="btn btn-primary">Apply</button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- main content: table and map -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-lg font-semibold">Parcels</h2>
+              <div class="text-sm text-slate-500">
+                Showing <span id="listCount">0</span> results
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table id="parcelsTable" class="w-full text-left min-w-[1000px]">
+                <thead>
+                  <tr class="text-xs text-slate-500 border-b">
+                    <th class="py-2 px-3">
+                      <input
+                        id="selectAll"
+                        type="checkbox"
+                        aria-label="Select all"
+                      />
+                    </th>
+                    <th class="py-2 px-3">Tracking</th>
+                    <th class="py-2 px-3">Recipient</th>
+                    <th class="py-2 px-3">Status</th>
+                    <th class="py-2 px-3">Assigned Driver</th>
+                    <th class="py-2 px-3">Created</th>
+                    <th class="py-2 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="parcelsTbody" class="divide-y">
+                  <tr>
+                    <td
+                      colspan="7"
+                      class="p-6 text-center text-sm text-slate-400"
+                    >
+                      Loading…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-3 flex items-center justify-between">
+              <div>
+                <button id="prevPage" class="btn btn-ghost btn-sm" disabled>
+                  Prev
+                </button>
+                <button id="nextPage" class="btn btn-ghost btn-sm" disabled>
+                  Next
+                </button>
+              </div>
+              <div class="text-sm text-slate-500">
+                Page <span id="pageIdx">1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- action logs -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h3 class="text-lg font-semibold mb-3">Recent activity</h3>
+            <ul
+              id="activityList"
+              class="text-sm text-slate-600 dark:text-slate-300 space-y-2"
+            >
+              <li class="text-xs text-slate-400">No activity yet</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- right column: map + stats + assign modal trigger -->
+        <aside class="space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h3 class="font-semibold mb-3">Map — pickups preview</h3>
+            <div
+              id="mapPlaceholder"
+              class="h-64 rounded-md bg-gradient-to-tr from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex items-center justify-center text-slate-400"
+            >
+              Map placeholder (integrate Leaflet or Google Maps)
+            </div>
+            <div class="mt-3 text-xs text-slate-500">
+              Click a parcel action to center the map on its location.
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Driver quick actions</h4>
+            <div
+              id="driverList"
+              class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300"
+            >
+              <div class="text-xs text-slate-400">Loading drivers…</div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Quick assign</h4>
+            <form id="quickAssignForm" class="space-y-3">
+              <label for="quickAssignDriver" class="sr-only"
+                >Select driver for quick assign</label
+              >
+              <select id="quickAssignDriver" class="input">
+                <option value="">Select driver</option>
+              </select>
+              <button
+                id="quickAssignBtn"
+                class="btn btn-primary w-full"
+                type="button"
+                disabled
+              >
+                Assign selected
+              </button>
+            </form>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <div id="footer-placeholder" role="contentinfo"></div>
+
+    <!-- Local shared scripts -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/staff.js"></script>
+
+    <!-- Page script: staff dashboard behavior -->
+    <script>
+      (function ($, Swal) {
+        const pageSize = 15;
+        let page = 0;
+        let total = 0;
+        let selected = new Set();
+        let drivers = [];
+        let pollingHandle = null;
+
+        // Insert header/footer components
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+
+        // Helper: safe parse
+        function safeParse(text) {
+          try {
+            return text ? JSON.parse(text) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function updateMetrics(m) {
+          $("#metricPending").text(m.pending ?? "0");
+          $("#metricUnassigned").text(m.unassigned ?? "0");
+          $("#metricInTransit").text(m.inTransit ?? "0");
+          $("#metricIssues").text(m.issues ?? "0");
+        }
+
+        function renderDriversList(list) {
+          drivers = list || [];
+          const $driverList = $("#driverList").empty();
+          const $select = $("#quickAssignDriver")
+            .empty()
+            .append('<option value="">Select driver</option>');
+          const $filterDriver = $("#filterDriver")
+            .empty()
+            .append('<option value="">Any</option>');
+          if (!drivers.length) {
+            $driverList.append(
+              '<div class="text-xs text-slate-400">No active drivers</div>'
+            );
+            return;
+          }
+          drivers.forEach((d) => {
+            const el = $(`<div class="flex items-center justify-between">
+            <div>
+              <div class="font-medium">${escapeHtml(d.name)}</div>
+              <div class="text-xs text-slate-400">${escapeHtml(
+                d.phone || ""
+              )} • ${escapeHtml(d.status || "")}</div>
+            </div>
+            <div class="text-xs text-slate-500">${escapeHtml(
+              d.distance || ""
+            )}</div>
+          </div>`);
+            $driverList.append(el);
+            $select.append(
+              `<option value="${escapeAttr(d.id)}">${escapeHtml(
+                d.name
+              )} — ${escapeHtml(d.phone || "")}</option>`
+            );
+            $filterDriver.append(
+              `<option value="${escapeAttr(d.id)}">${escapeHtml(
+                d.name
+              )}</option>`
+            );
+          });
+        }
+
+        function escapeHtml(s) {
+          if (s === undefined || s === null) return "";
+          return String(s).replace(
+            /[&<>"'`]/g,
+            (m) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+                "`": "&#96;",
+              }[m])
+          );
+        }
+        function escapeAttr(s) {
+          return escapeHtml(s);
+        }
+
+        // Render table rows
+        function renderRow(p) {
+          // expected p fields: id, trackingId, recipientName, recipientPhone, status, driver {id,name}, createdAt
+          const tid = p.trackingId || "#" + (p.id || "");
+          const driverName =
+            p.driver && p.driver.name
+              ? p.driver.name
+              : p.assignedDriverName || "-";
+          const checked = selected.has(String(p.id)) ? "checked" : "";
+          const row = $(`
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+            <td class="py-2 px-3 align-top"><input class="rowSelect" type="checkbox" data-id="${
+              p.id
+            }" ${checked} aria-label="Select parcel ${escapeAttr(tid)}"></td>
+            <td class="py-2 px-3 align-top font-mono text-sm">${escapeHtml(
+              tid
+            )}</td>
+            <td class="py-2 px-3">
+              <div class="font-medium">${escapeHtml(
+                p.recipientName || p.recipient || "-"
+              )}</div>
+              <div class="text-xs text-slate-400">${escapeHtml(
+                p.recipientPhone || ""
+              )}</div>
+            </td>
+            <td class="py-2 px-3">${escapeHtml(p.status)}</td>
+            <td class="py-2 px-3">${escapeHtml(driverName)}</td>
+            <td class="py-2 px-3">${escapeHtml(
+              p.createdAt ? new Date(p.createdAt).toLocaleString() : p.created
+            )}</td>
+            <td class="py-2 px-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button class="btn btn-xs btn-ghost btn-center" data-id="${
+                  p.id
+                }">Center</button>
+                <button class="btn btn-xs btn-outline btn-assign" data-id="${
+                  p.id
+                }">Assign</button>
+                <div class="relative">
+                  <button class="btn btn-xs btn-ghost btn-status" data-id="${
+                    p.id
+                  }">Status</button>
+                  <div style="display:none"></div>
+                </div>
+                <button class="btn btn-xs btn-danger btn-issue" data-id="${
+                  p.id
+                }">Flag</button>
+              </div>
+            </td>
+          </tr>
+        `);
+
+          // row actions
+          row.find(".rowSelect").on("change", function () {
+            const id = String($(this).data("id"));
+            if ($(this).is(":checked")) selected.add(id);
+            else selected.delete(id);
+            updateBulkButtons();
+          });
+
+          row.find(".btn-center").on("click", function () {
+            // Center map on parcel (user to integrate map)
+            pollCenterParcel(p);
+          });
+
+          row.find(".btn-assign").on("click", function () {
+            openAssignDialog(p);
+          });
+
+          row.find(".btn-status").on("click", function () {
+            openStatusDialog(p);
+          });
+
+          row.find(".btn-issue").on("click", async function () {
+            const id = $(this).data("id");
+            const { value: note } = await Swal.fire({
+              title: "Flag issue",
+              input: "text",
+              inputPlaceholder: "Describe the issue",
+              showCancelButton: true,
+            });
+            if (!note) return;
+            try {
+              const res = await fetch(
+                `/api/parcels/${encodeURIComponent(id)}/flag`,
+                {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ note }),
+                }
+              );
+              if (!res.ok) throw new Error("Failed to flag");
+              await Swal.fire({ icon: "success", title: "Flagged" });
+              refreshList();
+            } catch (err) {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: err.message || "",
+              });
+            }
+          });
+
+          return row;
+        }
+
+        function updateBulkButtons() {
+          const count = selected.size;
+          $("#bulkAssignBtn").prop("disabled", count === 0);
+          $("#quickAssignBtn").prop(
+            "disabled",
+            count === 0 || !$("#quickAssignDriver").val()
+          );
+        }
+
+        // Open assign dialog for single parcel
+        async function openAssignDialog(parcel) {
+          if (!drivers.length) {
+            await Swal.fire({
+              icon: "info",
+              title: "No drivers",
+              text: "No drivers available to assign.",
+            });
+            return;
+          }
+          const opts = drivers
+            .map(
+              (d) =>
+                `<option value="${escapeAttr(d.id)}">${escapeHtml(
+                  d.name
+                )} — ${escapeHtml(d.phone || "")}</option>`
+            )
+            .join("");
+          const { value: driverId } = await Swal.fire({
+            title: `Assign parcel ${parcel.trackingId || parcel.id}`,
+            html: `<select id="swDriver" class="sw-select">${opts}</select>`,
+            preConfirm: () => $("#swDriver").val(),
+            showCancelButton: true,
+          });
+          if (!driverId) return;
+          try {
+            const res = await fetch(
+              `/api/parcels/${encodeURIComponent(parcel.id)}/assign`,
+              {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ driverId }),
+              }
+            );
+            const text = await res.text();
+            const json = safeParse(text);
+            if (!res.ok)
+              throw new Error(
+                json && json.message ? json.message : `Error ${res.status}`
+              );
+            await Swal.fire({
+              icon: "success",
+              title: "Assigned",
+              text: json.message || "",
+            });
+            refreshList();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Assign failed",
+              text: err.message || "",
+            });
+          }
+        }
+
+        // Status update dialog
+        async function openStatusDialog(parcel) {
+          const statuses = [
+            "PENDING_PICKUP",
+            "IN_TRANSIT",
+            "DELIVERED",
+            "EXCEPTION",
+            "RETURNED",
+          ];
+          const opts = statuses
+            .map(
+              (s) => `<option value="${s}">${s.replaceAll("_", " ")}</option>`
+            )
+            .join("");
+          const { value: status } = await Swal.fire({
+            title: `Update status for ${parcel.trackingId || parcel.id}`,
+            html: `<select id="swStatus" class="sw-select">${opts}</select>`,
+            preConfirm: () => $("#swStatus").val(),
+            showCancelButton: true,
+          });
+          if (!status) return;
+          try {
+            const res = await fetch(
+              `/api/parcels/${encodeURIComponent(parcel.id)}/status`,
+              {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status }),
+              }
+            );
+            if (!res.ok) throw new Error("Failed to update status");
+            await Swal.fire({ icon: "success", title: "Updated" });
+            refreshList();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Update failed",
+              text: err.message || "",
+            });
+          }
+        }
+
+        // Center parcel on map (placeholder)
+        function pollCenterParcel(parcel) {
+          // if you integrate a map, call map.setView([lat,lon], zoom) here.
+          Swal.fire({
+            title: "Center map",
+            text: `Would center map on parcel ${
+              parcel.trackingId || parcel.id
+            }`,
+          });
+        }
+
+        // Fetch drivers and populate driver selects
+        async function loadDrivers() {
+          try {
+            const res = await fetch("/api/drivers?active=true", {
+              credentials: "include",
+            });
+            const text = await res.text();
+            if (!res.ok) return;
+            const json = safeParse(text) || [];
+            renderDriversList(json);
+          } catch (err) {
+            console.error("Drivers load error", err);
+          }
+        }
+
+        // Fetch parcel list
+        async function fetchParcels() {
+          const status = $("#filterStatus").val() || "";
+          const driver = $("#filterDriver").val() || "";
+          const from = $("#filterFrom").val() || "";
+          const to = $("#filterTo").val() || "";
+          const q = $("#filterSearch").val() || "";
+
+          const params = new URLSearchParams();
+          params.set("size", pageSize);
+          params.set("page", page);
+          if (status) params.set("status", status);
+          if (driver) params.set("driverId", driver);
+          if (from) params.set("from", from);
+          if (to) params.set("to", to);
+          if (q) params.set("q", q);
+
+          const url = `/api/parcels/staff?${params.toString()}`;
+          try {
+            const res = await fetch(url, { credentials: "include" });
+            const text = await res.text();
+            if (!res.ok) {
+              const body = safeParse(text);
+              throw new Error(
+                body && body.message ? body.message : `Error ${res.status}`
+              );
+            }
+            const json = safeParse(text) || { items: [], total: 0 };
+            return json;
+          } catch (err) {
+            console.error("parcels fetch error", err);
+            return { items: [], total: 0 };
+          }
+        }
+
+        // Render list and update UI
+        async function refreshList() {
+          $("#parcelsTbody").html(
+            '<tr><td colspan="7" class="p-6 text-center text-sm text-slate-400">Loading…</td></tr>'
+          );
+          const json = await fetchParcels();
+          const list = json.items || [];
+          total = json.total || list.length;
+          $("#listCount").text(total);
+          $("#pageIdx").text(page + 1);
+          $("#parcelsTbody").empty();
+          if (!list.length) {
+            $("#parcelsTbody").append(
+              '<tr><td colspan="7" class="p-6 text-center text-sm text-slate-400">No parcels found.</td></tr>'
+            );
+          } else {
+            list.forEach((p) => $("#parcelsTbody").append(renderRow(p)));
+          }
+          // enable/disable pagination
+          $("#prevPage").prop("disabled", page === 0);
+          $("#nextPage").prop("disabled", (page + 1) * pageSize >= total);
+        }
+
+        // Bulk assign selected parcels
+        async function bulkAssign() {
+          if (!drivers.length) {
+            await Swal.fire({ icon: "info", title: "No drivers available" });
+            return;
+          }
+          const opts = drivers
+            .map(
+              (d) =>
+                `<option value="${escapeAttr(d.id)}">${escapeHtml(
+                  d.name
+                )} — ${escapeHtml(d.phone || "")}</option>`
+            )
+            .join("");
+          const { value: driverId } = await Swal.fire({
+            title: `Assign ${selected.size} parcels`,
+            html: `<select id="swDriverBulk" class="sw-select">${opts}</select>`,
+            preConfirm: () => $("#swDriverBulk").val(),
+            showCancelButton: true,
+          });
+          if (!driverId) return;
+          const ids = Array.from(selected);
+          try {
+            const res = await fetch("/api/parcels/bulk-assign", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ parcelIds: ids, driverId }),
+            });
+            const text = await res.text();
+            const json = safeParse(text);
+            if (!res.ok)
+              throw new Error(
+                json && json.message ? json.message : "Bulk assign failed"
+              );
+            await Swal.fire({
+              icon: "success",
+              title: "Assigned",
+              text: json.message || "",
+            });
+            selected.clear();
+            $("#selectAll").prop("checked", false);
+            updateBulkButtons();
+            refreshList();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: err.message || "",
+            });
+          }
+        }
+
+        // Export CSV of current list (simple client-side CSV creation)
+        function exportCsv() {
+          (async () => {
+            const json = await fetchParcels();
+            const list = json.items || [];
+            if (!list.length)
+              return Swal.fire({ icon: "info", title: "Nothing to export" });
+            const rows = list.map((p) => ({
+              tracking: p.trackingId || p.id,
+              recipient: p.recipientName || p.recipient,
+              phone: p.recipientPhone || "",
+              status: p.status,
+              driver: (p.driver && p.driver.name) || p.assignedDriverName || "",
+              createdAt: p.createdAt || p.created || "",
+            }));
+            const header = Object.keys(rows[0]);
+            const csv = [header.join(",")]
+              .concat(
+                rows.map((r) =>
+                  header
+                    .map((h) => `"${String(r[h] ?? "").replace(/"/g, '""')}"`)
+                    .join(",")
+                )
+              )
+              .join("\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `parcels_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          })();
+        }
+
+        // Activity log (append)
+        function pushActivity(text) {
+          const time = new Date().toLocaleTimeString();
+          const $ul = $("#activityList");
+          $ul.prepend(
+            `<li><div class="text-xs text-slate-400">${time}</div><div>${escapeHtml(
+              text
+            )}</div></li>`
+          );
+        }
+
+        // Poll metrics + notifications periodically
+        async function loadDashboard() {
+          try {
+            const res = await fetch("/api/dashboard/staff", {
+              credentials: "include",
+            });
+            const text = await res.text();
+            if (!res.ok) return;
+            const json = safeParse(text) || {};
+            if (json.metrics) updateMetrics(json.metrics);
+            if (json.drivers) renderDriversList(json.drivers);
+            if (json.activity && Array.isArray(json.activity)) {
+              json.activity
+                .slice(0, 10)
+                .forEach((a) => pushActivity(a.message || JSON.stringify(a)));
+            }
+          } catch (err) {
+            console.error("dashboard load", err);
+          }
+        }
+
+        // start polling
+        function startPolling() {
+          if (pollingHandle) clearInterval(pollingHandle);
+          pollingHandle = setInterval(() => {
+            loadDashboard();
+            // optionally refresh small list counts only
+          }, 45_000);
+        }
+
+        // init
+        $(function () {
+          // wire buttons
+          $("#applyFilter").on("click", function (e) {
+            e.preventDefault();
+            page = 0;
+            refreshList();
+          });
+
+          $("#refreshBtn").on("click", async function () {
+            $(this).prop("disabled", true).text("Refreshing...");
+            await Promise.all([refreshList(), loadDrivers(), loadDashboard()]);
+            $(this).prop("disabled", false).text("Refresh");
+          });
+
+          $("#prevPage").on("click", function () {
+            if (page > 0) {
+              page--;
+              refreshList();
+            }
+          });
+          $("#nextPage").on("click", function () {
+            if ((page + 1) * pageSize < total) {
+              page++;
+              refreshList();
+            }
+          });
+
+          $("#selectAll").on("change", function () {
+            const checked = $(this).is(":checked");
+            $("#parcelsTbody")
+              .find(".rowSelect")
+              .each(function () {
+                $(this).prop("checked", checked);
+                const id = String($(this).data("id"));
+                if (checked) selected.add(id);
+                else selected.delete(id);
+              });
+            updateBulkButtons();
+          });
+
+          $("#bulkAssignBtn").on("click", function () {
+            bulkAssign();
+          });
+
+          $("#quickAssignDriver").on("change", function () {
+            $("#quickAssignBtn").prop(
+              "disabled",
+              !$(this).val() || selected.size === 0
+            );
+          });
+
+          $("#quickAssignBtn").on("click", async function () {
+            const driverId = $("#quickAssignDriver").val();
+            if (!driverId || selected.size === 0) return;
+            try {
+              const res = await fetch("/api/parcels/bulk-assign", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  parcelIds: Array.from(selected),
+                  driverId,
+                }),
+              });
+              if (!res.ok) throw new Error("Assign failed");
+              await Swal.fire({ icon: "success", title: "Assigned" });
+              selected.clear();
+              $("#selectAll").prop("checked", false);
+              updateBulkButtons();
+              refreshList();
+            } catch (err) {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: err.message || "",
+              });
+            }
+          });
+
+          $("#exportBtn").on("click", exportCsv);
+
+          // initial loads
+          Promise.all([loadDrivers(), refreshList(), loadDashboard()]);
+          startPolling();
+        });
+
+        // Expose some helpers for debugging / external scripts
+        window.staffDashboard = {
+          refreshList,
+          loadDrivers,
+          loadDashboard,
+          pushActivity,
+        };
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

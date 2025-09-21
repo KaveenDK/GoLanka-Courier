@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>New Shipment — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN (dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header include -->
+    <div id="header-placeholder"></div>
+
+    <main class="max-w-4xl mx-auto p-6">
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+        <h1 class="text-2xl font-bold mb-2">Create a new shipment</h1>
+        <p class="text-sm text-slate-500 mb-4">
+          Enter sender, recipient and parcel details to create a new booking.
+        </p>
+
+        <form id="shipmentForm" class="space-y-6" novalidate>
+          <fieldset aria-labelledby="sender-legend" class="border p-4 rounded">
+            <legend id="sender-legend" class="font-semibold">
+              Sender details
+            </legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              <label class="block">
+                <span class="text-sm">Full name</span>
+                <input
+                  name="senderName"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Alice Perera"
+                  required
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Phone</span>
+                <input
+                  name="senderPhone"
+                  class="input mt-1"
+                  type="tel"
+                  placeholder="+94 7xx xxxxxx"
+                  required
+                />
+              </label>
+              <label class="block md:col-span-2">
+                <span class="text-sm">Pickup address</span>
+                <input
+                  name="pickupAddress"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="No 12, Baker Street, Colombo"
+                  required
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">City</span>
+                <input
+                  name="pickupCity"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Colombo"
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Province</span>
+                <input
+                  name="pickupProvince"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Western"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset
+            aria-labelledby="recipient-legend"
+            class="border p-4 rounded"
+          >
+            <legend id="recipient-legend" class="font-semibold">
+              Recipient details
+            </legend>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+              <label class="block">
+                <span class="text-sm">Full name</span>
+                <input
+                  name="recipientName"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Mr. K"
+                  required
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Phone</span>
+                <input
+                  name="recipientPhone"
+                  class="input mt-1"
+                  type="tel"
+                  placeholder="+94 7xx xxxxxx"
+                  required
+                />
+              </label>
+              <label class="block md:col-span-2">
+                <span class="text-sm">Delivery address</span>
+                <input
+                  name="dropoffAddress"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="No 5, Galle Road, Galle"
+                  required
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">City</span>
+                <input
+                  name="dropoffCity"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Galle"
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Province</span>
+                <input
+                  name="dropoffProvince"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Southern"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset aria-labelledby="parcel-legend" class="border p-4 rounded">
+            <legend id="parcel-legend" class="font-semibold">
+              Parcel details
+            </legend>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+              <label class="block md:col-span-2">
+                <span class="text-sm">Description</span>
+                <input
+                  name="description"
+                  class="input mt-1"
+                  type="text"
+                  placeholder="Documents / Electronics / Clothes"
+                />
+              </label>
+
+              <label class="block">
+                <span class="text-sm">Weight (kg)</span>
+                <input
+                  name="weightKg"
+                  class="input mt-1"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value="0.5"
+                />
+              </label>
+
+              <label class="block">
+                <span class="text-sm">Length (cm)</span>
+                <input
+                  name="lengthCm"
+                  class="input mt-1"
+                  type="number"
+                  min="0"
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Width (cm)</span>
+                <input
+                  name="widthCm"
+                  class="input mt-1"
+                  type="number"
+                  min="0"
+                />
+              </label>
+              <label class="block">
+                <span class="text-sm">Height (cm)</span>
+                <input
+                  name="heightCm"
+                  class="input mt-1"
+                  type="number"
+                  min="0"
+                />
+              </label>
+
+              <label class="block">
+                <span class="text-sm">Service</span>
+                <select name="serviceType" class="input mt-1">
+                  <option value="standard" selected>Standard</option>
+                  <option value="express">Express</option>
+                </select>
+              </label>
+
+              <label class="block">
+                <span class="text-sm">Payment method</span>
+                <select name="paymentMethod" class="input mt-1">
+                  <option value="cash" selected>Cash on delivery</option>
+                  <option value="card">Card (online)</option>
+                </select>
+              </label>
+
+              <label class="block md:col-span-3">
+                <span class="text-sm">Declared value (LKR)</span>
+                <input
+                  name="declaredValue"
+                  class="input mt-1"
+                  type="number"
+                  min="0"
+                  step="1"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="flex items-center gap-3">
+            <button
+              id="createShipmentBtn"
+              class="btn btn-primary"
+              type="submit"
+            >
+              Create shipment
+            </button>
+            <button id="resetBtn" type="button" class="btn btn-secondary">
+              Reset
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <!-- footer include -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Local shared scripts -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/customer.js"></script>
+
+    <script>
+      (function ($, Swal) {
+        // If customer.js exports helpers, use them. If not, implement quick inline fallback
+        $("#shipmentForm").on("submit", async function (e) {
+          e.preventDefault();
+          const $btn = $("#createShipmentBtn");
+          $btn.prop("disabled", true).text("Creating...");
+
+          // collect form values
+          const get = (name) => $.trim($(`[name="${name}"]`).val() || "");
+          const payload = {
+            sender: {
+              name: get("senderName"),
+              phone: get("senderPhone"),
+              address: get("pickupAddress"),
+              city: get("pickupCity"),
+              province: get("pickupProvince"),
+            },
+            recipient: {
+              name: get("recipientName"),
+              phone: get("recipientPhone"),
+              address: get("dropoffAddress"),
+              city: get("dropoffCity"),
+              province: get("dropoffProvince"),
+            },
+            parcel: {
+              description: get("description"),
+              weightKg: parseFloat(get("weightKg") || 0),
+              lengthCm: parseFloat(get("lengthCm") || 0),
+              widthCm: parseFloat(get("widthCm") || 0),
+              heightCm: parseFloat(get("heightCm") || 0),
+              serviceType: get("serviceType"),
+              paymentMethod: get("paymentMethod"),
+              declaredValue: parseFloat(get("declaredValue") || 0),
+            },
+          };
+
+          // Basic validation
+          const errors = [];
+          if (!payload.sender.name) errors.push("Sender name required");
+          if (!payload.sender.phone) errors.push("Sender phone required");
+          if (!payload.sender.address) errors.push("Pickup address required");
+          if (!payload.recipient.name) errors.push("Recipient name required");
+          if (!payload.recipient.phone) errors.push("Recipient phone required");
+          if (!payload.recipient.address)
+            errors.push("Delivery address required");
+
+          if (errors.length) {
+            await Swal.fire({
+              icon: "error",
+              title: "Validation",
+              html: errors.join("<br/>"),
+            });
+            $btn.prop("disabled", false).text("Create shipment");
+            return;
+          }
+
+          try {
+            // adjust endpoint to your backend.
+            const res = await fetch("/api/parcels", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              credentials: "include",
+            });
+
+            const text = await res.text();
+            const json = text ? JSON.parse(text) : null;
+
+            if (!res.ok) {
+              const message =
+                json && json.message
+                  ? json.message
+                  : `Server error: ${res.status}`;
+              throw new Error(message);
+            }
+
+            // Expecting something like { success:true, trackingId: "...", message: "..." }
+            await Swal.fire({
+              icon: "success",
+              title: "Shipment created",
+              html: `<div class="text-left">Tracking ID: <strong>${
+                json.trackingId || "—"
+              }</strong><br/>${json.message ? json.message : ""}</div>`,
+            });
+
+            // Optionally redirect to tracking page with query
+            if (json.trackingId) {
+              window.location.href = `track.html?code=${encodeURIComponent(
+                json.trackingId
+              )}`;
+            } else {
+              // reset form
+              $("#shipmentForm")[0].reset();
+            }
+          } catch (err) {
+            console.error("Create shipment error", err);
+            await Swal.fire({
+              icon: "error",
+              title: "Failed",
+              text: err.message || "Request failed",
+            });
+          } finally {
+            $btn.prop("disabled", false).text("Create shipment");
+          }
+        });
+
+        $("#resetBtn").on("click", function () {
+          $("#shipmentForm")[0].reset();
+        });
+
+        // load header/footer if you use component includes
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Customer Dashboard — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN (for utility classes) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+
+    <!-- Small CSS replacements for .btn/.input used on this page (plain CSS, no Tailwind @apply) -->
+    <style>
+      :root {
+        --btn-radius: 0.5rem;
+        --btn-padding-x: 0.75rem;
+        --btn-padding-y: 0.5rem;
+        --btn-gap: 0.5rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--btn-gap);
+        border-radius: var(--btn-radius);
+        padding: var(--btn-padding-y) var(--btn-padding-x);
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border-color: #e5e7eb; /* gray-200 */
+        color: inherit;
+      }
+
+      .btn-primary {
+        background: #4f46e5; /* indigo-600 */
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .btn-danger {
+        background: #dc2626; /* red-600 */
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+      .btn-xs {
+        padding: 0.125rem 0.4rem;
+        font-size: 0.75rem;
+      }
+
+      .btn[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .input {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db; /* gray-300 */
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      .field-error {
+        color: #b91c1c;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+      }
+
+      /* small hover/focus helpers */
+      .btn:hover:not([disabled]) {
+        filter: brightness(0.98);
+      }
+      .input:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.15);
+        border-color: #6366f1;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- INLINE header (no remote load) -->
+    <header class="bg-white shadow mb-6">
+      <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img
+            src="../../assets/images/logo.png"
+            alt="logo"
+            class="w-10 h-10 object-contain"
+          />
+          <div>
+            <div class="font-bold">GoLanka Courier</div>
+            <div class="text-xs text-slate-500">Fast parcel delivery</div>
+          </div>
+        </div>
+        <nav>
+          <a href="../customer/dashboard.html" class="text-sm mr-4"
+            >Dashboard</a
+          >
+          <a href="../customer/profile.html" class="text-sm mr-4">Profile</a>
+          <a
+            href="../auth/signin.html"
+            id="top-signout"
+            class="text-sm text-red-600"
+            >Sign out</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <header
+        class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+      >
+        <div>
+          <h1 class="text-2xl font-bold">
+            Welcome back, <span id="customerName">Customer</span>
+          </h1>
+          <p class="text-sm text-slate-500">
+            Overview of your recent shipments and account
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="refreshDashboardBtn" class="btn btn-ghost">
+            Refresh
+          </button>
+          <button id="createQuickBtn" class="btn btn-primary">
+            Create Shipment
+          </button>
+        </div>
+      </header>
+
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Metrics -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
+              <span class="text-xs text-slate-400">Active Shipments</span>
+              <span id="metricActive" class="text-2xl font-bold mt-2">—</span>
+              <span class="text-xs text-slate-500 mt-2"
+                >Updated <span id="metricUpdatedActive">—</span></span
+              >
+            </div>
+            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
+              <span class="text-xs text-slate-400">Delivered</span>
+              <span id="metricDelivered" class="text-2xl font-bold mt-2"
+                >—</span
+              >
+              <span class="text-xs text-slate-500 mt-2">Last 30 days</span>
+            </div>
+            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
+              <span class="text-xs text-slate-400">Pending Payments</span>
+              <span id="metricPending" class="text-2xl font-bold mt-2">—</span>
+              <span class="text-xs text-slate-500 mt-2">Requires action</span>
+            </div>
+            <div class="p-4 rounded-xl bg-white shadow flex flex-col">
+              <span class="text-xs text-slate-400">Total Spent (LKR)</span>
+              <span id="metricSpent" class="text-2xl font-bold mt-2">—</span>
+              <span class="text-xs text-slate-500 mt-2">All time</span>
+            </div>
+          </div>
+
+          <!-- Recent shipments -->
+          <div class="bg-white rounded-xl shadow p-4">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold">Recent shipments</h2>
+              <div class="text-sm text-slate-500">
+                Showing up to <span id="recentLimit">10</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left min-w-[800px]">
+                <thead>
+                  <tr class="text-xs text-slate-500 border-b">
+                    <th class="py-2 px-3">Tracking</th>
+                    <th class="py-2 px-3">Recipient</th>
+                    <th class="py-2 px-3">Status</th>
+                    <th class="py-2 px-3">Created</th>
+                    <th class="py-2 px-3">Service</th>
+                    <th class="py-2 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTableBody" class="divide-y">
+                  <!-- rows inserted by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+              <a href="track.html" class="btn btn-ghost">Open Tracking page</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <aside class="space-y-6">
+          <div class="bg-white rounded-xl shadow p-4">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold"
+              >
+                A
+              </div>
+              <div>
+                <div id="profileName" class="font-semibold">Alice</div>
+                <div id="profileEmail" class="text-sm text-slate-500">
+                  email@example.com
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 text-sm text-slate-500 space-y-2">
+              <div>
+                <strong>Phone:</strong> <span id="profilePhone">—</span>
+              </div>
+              <div>
+                <strong>Address:</strong> <span id="profileAddress">—</span>
+              </div>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+              <a href="../customer/profile.html" class="btn btn-sm btn-ghost"
+                >Edit profile</a
+              >
+              <button id="btnLogout" class="btn btn-sm btn-danger">
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-4">
+            <h3 class="font-semibold mb-2">Quick create</h3>
+            <form
+              id="quickCreateForm"
+              class="space-y-3"
+              autocomplete="off"
+              novalidate
+            >
+              <input
+                name="recipientName"
+                class="input"
+                type="text"
+                placeholder="Recipient name"
+                required
+              />
+              <input
+                name="recipientPhone"
+                class="input"
+                type="tel"
+                placeholder="Recipient phone"
+                required
+              />
+              <input
+                name="dropoffAddress"
+                class="input"
+                type="text"
+                placeholder="Delivery address"
+                required
+              />
+              <div class="flex gap-2">
+                <input
+                  name="weightKg"
+                  class="input"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="Weight (kg)"
+                />
+                <label for="serviceType" class="sr-only">Service Type</label>
+                <select id="serviceType" name="serviceType" class="input">
+                  <option value="standard">Standard</option>
+                  <option value="express">Express</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  id="quickCreateBtn"
+                  class="btn btn-primary flex-1"
+                  type="submit"
+                >
+                  Create
+                </button>
+                <button id="quickClearBtn" type="button" class="btn btn-ghost">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="notifPreview" class="bg-white rounded-xl shadow p-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold">Notifications</h4>
+              <button
+                id="clearNotifs"
+                class="text-xs text-slate-500 hover:text-slate-700"
+              >
+                Clear
+              </button>
+            </div>
+            <div id="notifList" class="mt-3 text-sm text-slate-500 space-y-2">
+              <div class="text-xs text-slate-400">No notifications</div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <!-- INLINE footer -->
+    <footer class="bg-white mt-12">
+      <div class="max-w-7xl mx-auto p-4 text-sm text-slate-500">
+        © <span id="year"></span> GoLanka Courier — Built with ❤️
+      </div>
+    </footer>
+
+    <!-- Set API base before script.js loads -->
+    <script>
+      window.API_BASE = window.API_BASE || "http://localhost:8080";
+    </script>
+
+    <script>
+      window.USE_MOCK_ON_500 = true;
+    </script>
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/customer.js"></script>
+
+    <script>
+      // Ensure year shown
+      try {
+        document.getElementById("year").textContent = new Date().getFullYear();
+      } catch (e) {
+        /* ignore */
+      }
+    </script>
+
+    <!-- Page logic (defensive) -->
+    <script>
+      (function ($, Swal) {
+        "use strict";
+
+        // Minimal fallback Api if window.GoLankaApi is not provided by ../../js/script.js
+        const Api = (function () {
+          if (window.GoLankaApi) return window.GoLankaApi;
+
+          // small helper functions
+          function safeJsonParse(text) {
+            try {
+              return text ? JSON.parse(text) : null;
+            } catch (e) {
+              return null;
+            }
+          }
+          function _base() {
+            return (window.API_BASE || "").replace(/\/+$/, "");
+          }
+          async function apiFetch(path, opts = {}) {
+            const url = path.startsWith("http")
+              ? path
+              : path.startsWith("/")
+              ? _base() + path
+              : _base() + "/" + path;
+            const options = Object.assign(
+              { method: "GET", credentials: "include", headers: {} },
+              opts
+            );
+            if (
+              options.body &&
+              typeof options.body === "object" &&
+              !(options.body instanceof FormData)
+            ) {
+              options.headers["Content-Type"] =
+                options.headers["Content-Type"] || "application/json";
+              options.body = JSON.stringify(options.body);
+            }
+            let resp;
+            try {
+              resp = await fetch(url, options);
+            } catch (err) {
+              throw {
+                status: 0,
+                body: null,
+                message: "Network error: " + (err.message || err),
+              };
+            }
+            return resp;
+          }
+          async function apiJson(path, opts = {}) {
+            const resp = await apiFetch(path, opts);
+            const text = await resp.text().catch(() => "");
+            const json = safeJsonParse(text);
+            if (!resp.ok)
+              throw {
+                status: resp.status,
+                body: json || text,
+                message:
+                  json?.message ||
+                  resp.statusText ||
+                  `Request failed (${resp.status})`,
+              };
+            return json;
+          }
+          async function apiPostJson(path, body) {
+            return apiJson(path, { method: "POST", body });
+          }
+
+          function toast(opts) {
+            if (Swal) {
+              Swal.fire({
+                toast: !!opts.toast,
+                position: opts.position || "top-end",
+                showConfirmButton: false,
+                timer: opts.timer || 2000,
+                icon: opts.icon || undefined,
+                title: opts.title || undefined,
+                text: opts.text || undefined,
+              });
+            } else {
+              console.log("[toast]", opts.title || opts.text || "");
+            }
+          }
+
+          function getAccessToken() {
+            return localStorage.getItem("accessToken");
+          }
+          function setAccessToken(t) {
+            if (t) localStorage.setItem("accessToken", t);
+            else localStorage.removeItem("accessToken");
+          }
+          function isAuthenticated() {
+            const t = getAccessToken();
+            if (!t) return false;
+            try {
+              const parts = t.split(".");
+              if (parts.length < 2) return true;
+              const payload = JSON.parse(
+                atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+              );
+              const exp = payload.exp;
+              if (!exp) return true;
+              const expMs = exp > 1e12 ? exp : exp * 1000;
+              return Date.now() < expMs;
+            } catch (e) {
+              return true;
+            }
+          }
+          function getUser() {
+            const t = getAccessToken();
+            if (!t) return null;
+            try {
+              const parts = t.split(".");
+              const p = parts[1];
+              const json = JSON.parse(
+                decodeURIComponent(
+                  atob(p.replace(/-/g, "+").replace(/_/g, "/"))
+                    .split("")
+                    .map(
+                      (c) =>
+                        "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+                    )
+                    .join("")
+                )
+              );
+              return {
+                email: json.sub || json.email,
+                name: json.name || json.fullName || null,
+                roles: json.roles || json.authorities || [],
+              };
+            } catch (e) {
+              return null;
+            }
+          }
+          async function logout(redirectTo) {
+            try {
+              await apiFetch("/api/auth/logout", { method: "POST" }).catch(
+                () => {}
+              );
+            } catch (e) {
+              /* ignore */
+            }
+            setAccessToken(null);
+            const tgt = redirectTo || "/pages/auth/signin.html";
+            try {
+              window.location.replace(tgt);
+            } catch (err) {
+              window.location.href = tgt;
+            }
+          }
+
+          // Expose limited fallback API
+          return {
+            apiFetch,
+            apiJson,
+            apiPostJson,
+            toast,
+            logout,
+            isAuthenticated,
+            getUser,
+            setAccessToken,
+            getAccessToken,
+            _isFallback: true,
+          };
+        })();
+
+        // jQuery guard
+        if (!$) {
+          console.error("jQuery is required for this page. Please include it.");
+          return;
+        }
+
+        const recentLimit = 10;
+        $("#recentLimit").text(recentLimit);
+
+        // Helper: escape HTML
+        function escapeHtml(s) {
+          if (s == null) return "";
+          return String(s).replace(
+            /[&<>"'`]/g,
+            (m) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+                "`": "&#96;",
+              }[m])
+          );
+        }
+
+        function logAndNotify(msg, detail) {
+          console.warn(msg, detail);
+          if (Api && Api.toast) Api.toast({ title: msg, icon: "error" });
+        }
+
+        async function requireAuthOrRedirect() {
+          try {
+            if (Api && typeof Api.isAuthenticated === "function") {
+              if (!Api.isAuthenticated()) {
+                window.location.href = "/pages/auth/signin.html";
+                return false;
+              }
+              return true;
+            } else {
+              const res = await fetch("/api/users/me", {
+                credentials: "include",
+              });
+              if (res.status === 401) {
+                window.location.href = "/pages/auth/signin.html";
+                return false;
+              }
+              return true;
+            }
+          } catch (e) {
+            console.warn("Auth check failed", e);
+            return true;
+          }
+        }
+
+        // Render a table row for a parcel
+        function renderRow(p) {
+          const tracking = p.trackingId || p.trackingNumber || p.id || "-";
+          const recipient =
+            (p.recipient && p.recipient.name) ||
+            p.recipientName ||
+            p.recipientFullName ||
+            "-";
+          const status = p.status || "Unknown";
+          const created = p.createdAt
+            ? new Date(p.createdAt).toLocaleString()
+            : p.created || "-";
+
+          const $tr = $(`
+            <tr class="hover:bg-slate-50">
+              <td class="py-2 px-3 align-top">
+                <div class="font-mono text-sm">${escapeHtml(tracking)}</div>
+                <div class="text-xs text-slate-400">${escapeHtml(
+                  p.id ? "ID:" + p.id : ""
+                )}</div>
+              </td>
+              <td class="py-2 px-3">${escapeHtml(recipient)}</td>
+              <td class="py-2 px-3">${escapeHtml(status)}</td>
+              <td class="py-2 px-3">${escapeHtml(created)}</td>
+              <td class="py-2 px-3">${escapeHtml(p.serviceType || "-")}</td>
+              <td class="py-2 px-3 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button class="btn btn-xs btn-ghost btn-track" data-code="${escapeHtml(
+                    tracking
+                  )}">Track</button>
+                  <button class="btn btn-xs btn-outline btn-view" data-id="${
+                    p.id || ""
+                  }">View</button>
+                </div>
+              </td>
+            </tr>
+          `);
+
+          $tr.find(".btn-track").on("click", function () {
+            const code = $(this).data("code");
+            window.location.href = `track.html?code=${encodeURIComponent(
+              code
+            )}`;
+          });
+          $tr.find(".btn-view").on("click", function () {
+            const id = $(this).data("id");
+            window.location.href = `parcel-detail.html?id=${encodeURIComponent(
+              id
+            )}`;
+          });
+
+          return $tr;
+        }
+
+        // Load profile & metrics
+        async function loadProfileAndMetrics() {
+          try {
+            const json = await Api.apiJson("/api/dashboard/customer", {
+              method: "GET",
+            });
+            if (json && json.profile) {
+              $("#customerName").text(
+                json.profile.name || json.profile.fullName || "Customer"
+              );
+              $("#profileName").text(
+                json.profile.name || json.profile.fullName || "—"
+              );
+              $("#profileEmail").text(json.profile.email || "—");
+              $("#profilePhone").text(json.profile.phone || "—");
+              $("#profileAddress").text(
+                json.profile.address || json.profile.addressLine || "—"
+              );
+            }
+            if (json && json.metrics) {
+              $("#metricActive").text(json.metrics.active ?? "0");
+              $("#metricDelivered").text(json.metrics.delivered ?? "0");
+              $("#metricPending").text(json.metrics.pending ?? "0");
+              $("#metricSpent").text(
+                json.metrics.spent != null
+                  ? Number(json.metrics.spent).toLocaleString()
+                  : "0"
+              );
+              $("#metricUpdatedActive").text(new Date().toLocaleTimeString());
+            }
+            if (json && Array.isArray(json.notifications))
+              renderNotifications(json.notifications);
+          } catch (err) {
+            if (err && err.status === 401) {
+              window.location.href = "/pages/auth/signin.html";
+              return;
+            }
+            if (err && err.status >= 500)
+              logAndNotify(
+                "Server error while loading dashboard (500). Check backend logs.",
+                err
+              );
+            else if (err && err.status === 0)
+              logAndNotify(
+                "Network error while calling backend. Is the backend running?",
+                err
+              );
+            else logAndNotify("Failed loading dashboard metrics", err);
+            console.error("loadProfileAndMetrics error:", err);
+          }
+        }
+
+        // Refresh recent shipments
+        async function refreshRecent() {
+          const $tbody = $("#recentTableBody");
+          $tbody
+            .empty()
+            .append(
+              `<tr><td class="p-4 text-sm text-slate-400" colspan="6">Loading…</td></tr>`
+            );
+          try {
+            const list =
+              (await Api.apiJson(`/api/parcels?limit=${recentLimit}`, {
+                method: "GET",
+              })) || [];
+            $tbody.empty();
+            if (!list.length) {
+              $tbody.append(
+                `<tr><td class="p-4 text-sm text-slate-500" colspan="6">No recent shipments.</td></tr>`
+              );
+              return;
+            }
+            list.forEach((p) => $tbody.append(renderRow(p)));
+          } catch (err) {
+            if (err && err.status >= 500) {
+              $tbody
+                .empty()
+                .append(
+                  `<tr><td class="p-4 text-sm text-red-500" colspan="6">Server error while fetching parcels (500). Check backend logs.</td></tr>`
+                );
+            } else if (err && err.status === 401) {
+              window.location.href = "/pages/auth/signin.html";
+            } else {
+              $tbody
+                .empty()
+                .append(
+                  `<tr><td class="p-4 text-sm text-red-500" colspan="6">Failed to load recent shipments: ${escapeHtml(
+                    err?.message || err?.body?.message || ""
+                  )}</td></tr>`
+                );
+            }
+            console.error("refreshRecent error", err);
+          }
+        }
+
+        function renderNotifications(list) {
+          const $list = $("#notifList");
+          $list.empty();
+          if (!list || !list.length) {
+            $list.append(
+              `<div class="text-xs text-slate-400">No notifications</div>`
+            );
+            return;
+          }
+          list.slice(0, 5).forEach((n) => {
+            const time = n.timestamp
+              ? new Date(n.timestamp).toLocaleString()
+              : "";
+            $list.append(
+              `<div class="p-2 rounded border bg-white"><div class="text-xs text-slate-400">${escapeHtml(
+                time
+              )}</div><div class="text-sm">${escapeHtml(
+                n.title || n.message || "Notification"
+              )}</div></div>`
+            );
+          });
+        }
+
+        // Quick create handler
+        $("#quickCreateForm").on("submit", async function (e) {
+          e.preventDefault();
+          const $btn = $("#quickCreateBtn")
+            .prop("disabled", true)
+            .text("Creating...");
+          const payload = {
+            recipientName: $.trim($('[name="recipientName"]').val() || ""),
+            recipientPhone: $.trim($('[name="recipientPhone"]').val() || ""),
+            dropoffAddress: $.trim($('[name="dropoffAddress"]').val() || ""),
+            serviceType: $('[name="serviceType"]').val() || "standard",
+            weightKg: parseFloat($('[name="weightKg"]').val() || 0) || 0,
+          };
+          const missing = [];
+          if (!payload.recipientName) missing.push("Recipient name required");
+          if (!payload.recipientPhone) missing.push("Recipient phone required");
+          if (!payload.dropoffAddress)
+            missing.push("Delivery address required");
+          if (missing.length) {
+            await Swal.fire({
+              icon: "error",
+              title: "Validation",
+              html: missing.join("<br/>"),
+            });
+            $btn.prop("disabled", false).text("Create");
+            return;
+          }
+
+          try {
+            const res = await Api.apiPostJson("/api/parcels", payload);
+            await Swal.fire({
+              icon: "success",
+              title: "Shipment created",
+              text: res?.message || "Created",
+            });
+            $("#quickCreateForm")[0].reset();
+            await refreshRecent();
+            await loadProfileAndMetrics();
+          } catch (err) {
+            console.error("quick create error", err);
+            await Swal.fire({
+              icon: "error",
+              title: "Create failed",
+              text: err?.body?.message || err.message || "Request failed",
+            });
+          } finally {
+            $btn.prop("disabled", false).text("Create");
+          }
+        });
+
+        // Notifications polling
+        let notifInterval = null;
+        async function pollNotifications() {
+          try {
+            const json = await Api.apiJson("/api/notifications?limit=5", {
+              method: "GET",
+            });
+            renderNotifications(json);
+          } catch (e) {
+            console.warn("pollNotifications error", e);
+          }
+        }
+        function startNotifPolling() {
+          pollNotifications().catch(() => {});
+          notifInterval = setInterval(
+            () => pollNotifications().catch(() => {}),
+            60000
+          );
+        }
+
+        // Logout
+        $("#btnLogout, #top-signout").on("click", async function (e) {
+          e.preventDefault();
+          try {
+            await Api.logout("/pages/auth/signin.html");
+          } catch (err) {
+            console.warn("Logout helper failed", err);
+            localStorage.removeItem("accessToken");
+            window.location.href = "/pages/auth/signin.html";
+          }
+        });
+
+        // Refresh dashboard button
+        $("#refreshDashboardBtn").on("click", async function () {
+          $(this).prop("disabled", true).text("Refreshing...");
+          await Promise.all([refreshRecent(), loadProfileAndMetrics()]);
+          $(this).prop("disabled", false).text("Refresh");
+        });
+
+        // Wire Create Shipment button to scroll to quick create
+        $("#createQuickBtn").on("click", function () {
+          const form = $("#quickCreateForm");
+          if (form.length) {
+            $("html,body").animate({ scrollTop: form.offset().top - 80 }, 300);
+            form.find('[name="recipientName"]').focus();
+          }
+        });
+
+        // Initial load
+        $(async function () {
+          await requireAuthOrRedirect();
+          // Fire both in parallel (dashboard and list)
+          await Promise.all([refreshRecent(), loadProfileAndMetrics()]);
+          startNotifPolling();
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

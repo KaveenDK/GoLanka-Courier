@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Verify Email — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+
+    <!-- IMPORTANT:
+         Ensure this points to your backend (not the static file server).
+         Example: window.API_BASE = 'http://localhost:8080';
+         You can also set API_BASE inside js/script.js.
+    -->
+    <script>
+      window.COMPONENTS_BASE = "../../";
+      window.API_BASE = window.API_BASE || "http://localhost:8080";
+    </script>
+  </head>
+
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-6"
+  >
+    <main
+      class="w-full max-w-lg bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6"
+    >
+      <header class="mb-6">
+        <h1 class="text-2xl font-bold">Verify your email</h1>
+        <p class="text-sm text-slate-500 mt-1">
+          Enter the verification code we sent to your email.
+        </p>
+      </header>
+
+      <form id="verifyForm" class="space-y-4" novalidate>
+        <label class="block">
+          <span class="text-sm font-medium">Email</span>
+          <input
+            required
+            name="email"
+            type="email"
+            class="input mt-1"
+            placeholder="alice@example.com"
+          />
+          <p
+            class="text-xs text-red-500 mt-1 hidden field-error"
+            data-field="email"
+          ></p>
+        </label>
+
+        <label class="block">
+          <span class="text-sm font-medium">Verification code</span>
+          <input
+            required
+            name="code"
+            type="text"
+            class="input mt-1"
+            placeholder="951781"
+          />
+          <p
+            class="text-xs text-red-500 mt-1 hidden field-error"
+            data-field="code"
+          ></p>
+        </label>
+
+        <div class="flex items-center gap-3">
+          <button id="verifyBtn" type="submit" class="btn btn-primary">
+            Verify
+          </button>
+          <a
+            id="backToSignin"
+            href="signin.html"
+            class="text-sm text-slate-500 hover:underline"
+            >Back to sign in</a
+          >
+        </div>
+      </form>
+    </main>
+
+    <!-- Load your shared app scripts -->
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+
+    <script>
+      (function ($, Swal) {
+        const $form = $("#verifyForm");
+        const $btn = $("#verifyBtn");
+
+        function clearErrors() {
+          $(".field-error").each(function () {
+            $(this).addClass("hidden").text("");
+          });
+        }
+
+        function showFieldError(field, msg) {
+          const $el = $(`.field-error[data-field="${field}"]`);
+          if ($el.length) $el.removeClass("hidden").text(msg);
+          else console.warn("Validation error:", field, msg);
+        }
+
+        // POST helper: prefer centralized GoLankaApi.apiJson, fallback to window.API_BASE
+        async function postJson(path, body) {
+          if (
+            window.GoLankaApi &&
+            typeof window.GoLankaApi.apiJson === "function"
+          ) {
+            return window.GoLankaApi.apiJson(path, { method: "POST", body });
+          }
+
+          const base =
+            (window.API_BASE && String(window.API_BASE).replace(/\/+$/, "")) ||
+            "";
+          const url = base ? `${base}${path}` : path;
+
+          const resp = await fetch(url, {
+            method: "POST",
+            credentials: "include", // send cookies if backend uses them
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          const text = await resp.text().catch(() => "");
+          let json = null;
+          try {
+            json = text ? JSON.parse(text) : null;
+          } catch (e) {
+            json = null;
+          }
+
+          if (!resp.ok) {
+            throw { status: resp.status, body: json || text || null };
+          }
+          return json;
+        }
+
+        $form.on("submit", async function (e) {
+          e.preventDefault();
+          clearErrors();
+          $btn.prop("disabled", true).text("Verifying...");
+
+          const payload = {
+            email: $form.find('[name="email"]').val()?.trim(),
+            code: $form.find('[name="code"]').val()?.trim(),
+          };
+
+          // client-side validation
+          const errs = [];
+          if (!payload.email)
+            errs.push({ field: "email", message: "Email is required" });
+          if (!payload.code)
+            errs.push({
+              field: "code",
+              message: "Verification code is required",
+            });
+          if (errs.length) {
+            errs.forEach((e) => showFieldError(e.field, e.message));
+            $btn.prop("disabled", false).text("Verify");
+            return;
+          }
+
+          try {
+            const resp = await postJson("/api/auth/verify-email", payload);
+
+            // handle backend response
+            if (resp && resp.success) {
+              await Swal.fire({
+                icon: "success",
+                title: "Verified",
+                text: resp.message || "Email verified",
+              });
+              window.location.href = "signin.html";
+            } else {
+              await Swal.fire({
+                icon: "info",
+                title: "Notice",
+                text:
+                  resp && resp.message ? resp.message : "Verification complete",
+              });
+            }
+          } catch (err) {
+            console.error("Verify error", err);
+            // Typical shapes: {status, body} or thrown Error
+            if (err && err.body) {
+              const body = err.body;
+              if (Array.isArray(body.validationErrors)) {
+                body.validationErrors.forEach((v) =>
+                  showFieldError(v.field, v.message)
+                );
+                await Swal.fire(
+                  "Validation error",
+                  "Fix the highlighted fields and retry",
+                  "error"
+                );
+              } else if (body.message) {
+                await Swal.fire("Error", body.message, "error");
+              } else {
+                await Swal.fire(
+                  "Error",
+                  `Request failed (${err.status || "?"})`,
+                  "error"
+                );
+              }
+            } else if (err && err.status) {
+              // 405 most likely coming from static server: explain to user
+              if (err.status === 405) {
+                await Swal.fire(
+                  "Error",
+                  "Method not allowed. The request is being sent to the static file server instead of your backend. Set window.API_BASE to your API (e.g. http://localhost:8080) or configure your dev server proxy.",
+                  "error"
+                );
+              } else {
+                await Swal.fire(
+                  "Error",
+                  `Request failed (${err.status})`,
+                  "error"
+                );
+              }
+            } else {
+              await Swal.fire(
+                "Error",
+                "Verification failed. Check console for details.",
+                "error"
+              );
+            }
+          } finally {
+            $btn.prop("disabled", false).text("Verify");
+          }
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

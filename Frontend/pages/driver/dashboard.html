@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Driver Dashboard — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN (dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header -->
+    <div id="header-placeholder" role="banner"></div>
+
+    <main class="max-w-6xl mx-auto p-6">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Driver Dashboard</h1>
+          <p class="text-sm text-slate-500">
+            Your assigned pickups, active route and quick actions.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="toggleOnline" class="btn btn-ghost">Go Online</button>
+          <button id="updateLocationBtn" class="btn btn-ghost">
+            Update Location
+          </button>
+          <a href="route.html" id="openRouteBtn" class="btn btn-primary"
+            >Open Route</a
+          >
+        </div>
+      </div>
+
+      <!-- metrics -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Assigned Parcels</div>
+          <div id="metricAssigned" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">
+            Total currently assigned to you
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Pickups Today</div>
+          <div id="metricPickups" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Scheduled for today</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-800 shadow">
+          <div class="text-xs text-slate-400">Pending Deliveries</div>
+          <div id="metricPending" class="text-2xl font-bold mt-2">—</div>
+          <div class="text-xs text-slate-500 mt-1">Not yet delivered</div>
+        </div>
+      </section>
+
+      <!-- main columns -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Controls & search -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="text-lg font-semibold">Assigned Parcels</h2>
+                <p class="text-sm text-slate-500">
+                  Manage pickups and deliveries
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input
+                  id="searchInput"
+                  type="search"
+                  placeholder="Search tracking id / recipient"
+                  class="input"
+                />
+                <button id="refreshBtn" class="btn btn-ghost">Refresh</button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table id="assignedTable" class="w-full text-left min-w-[900px]">
+                <thead>
+                  <tr class="text-xs text-slate-500 border-b">
+                    <th class="py-2 px-3">Tracking</th>
+                    <th class="py-2 px-3">Recipient</th>
+                    <th class="py-2 px-3">Pickup Address</th>
+                    <th class="py-2 px-3">Status</th>
+                    <th class="py-2 px-3">ETA</th>
+                    <th class="py-2 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="assignedTbody" class="divide-y">
+                  <tr>
+                    <td
+                      colspan="6"
+                      class="p-6 text-center text-sm text-slate-400"
+                    >
+                      Loading…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- activity & notes -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h3 class="text-lg font-semibold mb-3">Recent activity & notes</h3>
+            <ul
+              id="activityList"
+              class="text-sm text-slate-600 dark:text-slate-300 space-y-2"
+            >
+              <li class="text-xs text-slate-400">No activity yet</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- right column: map + quick actions -->
+        <aside class="space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Map — Live location</h4>
+            <div
+              id="mapPlaceholder"
+              class="h-64 rounded-md bg-gradient-to-tr from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 flex items-center justify-center text-slate-400"
+            >
+              Map placeholder. Integrate Leaflet or Google Maps here.
+            </div>
+            <div class="mt-2 text-xs text-slate-500">
+              Update location to share with dispatch.
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Quick actions</h4>
+            <div class="mt-3 space-y-2">
+              <button id="startRouteBtn" class="btn btn-primary w-full">
+                Start Route
+              </button>
+              <button id="completeAllBtn" class="btn btn-ghost w-full">
+                Mark All Delivered
+              </button>
+              <button id="reportBtn" class="btn btn-ghost w-full">
+                Report Issue
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Driver status</h4>
+            <div
+              id="driverStatus"
+              class="mt-3 text-sm text-slate-600 dark:text-slate-300"
+            >
+              Offline
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <div id="footer-placeholder" role="contentinfo"></div>
+
+    <!-- Shared scripts -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/driver.js"></script>
+
+    <!-- Page-specific script (driver behaviors) -->
+    <script>
+      (function ($, Swal) {
+        // small helper to parse JSON safely
+        function safeParse(text) {
+          try {
+            return text ? JSON.parse(text) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function escapeHtml(s) {
+          if (s === undefined || s === null) return "";
+          return String(s).replace(
+            /[&<>"'`]/g,
+            (m) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+                "`": "&#96;",
+              }[m])
+          );
+        }
+
+        // load header/footer
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+
+        let assigned = [];
+        let polling = null;
+        let online = false;
+
+        async function loadAssigned(q) {
+          $("#assignedTbody").html(
+            '<tr><td colspan="6" class="p-6 text-center text-sm text-slate-400">Loading…</td></tr>'
+          );
+          const params = new URLSearchParams();
+          if (q) params.set("q", q);
+          try {
+            const res = await fetch(
+              "/api/driver/parcels?" + params.toString(),
+              { credentials: "include" }
+            );
+            const txt = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(txt) && safeParse(txt).message) || "Failed to fetch"
+              );
+            const json = safeParse(txt) || [];
+            assigned = Array.isArray(json) ? json : json.items || [];
+            renderAssigned();
+            updateMetrics();
+          } catch (err) {
+            $("#assignedTbody").html(
+              '<tr><td colspan="6" class="p-6 text-center text-sm text-red-500">Failed to load</td></tr>'
+            );
+            console.error("loadAssigned", err);
+          }
+        }
+
+        function renderAssigned() {
+          const $tb = $("#assignedTbody").empty();
+          if (!assigned.length) {
+            $tb.append(
+              '<tr><td colspan="6" class="p-6 text-center text-sm text-slate-400">No assigned parcels.</td></tr>'
+            );
+            return;
+          }
+          assigned.forEach((p) => {
+            const tracking = p.trackingId || "#" + p.id;
+            const row = $(`
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+              <td class="py-2 px-3 font-mono text-sm">${escapeHtml(
+                tracking
+              )}</td>
+              <td class="py-2 px-3">
+                <div class="font-medium">${escapeHtml(
+                  p.recipientName || p.recipient || "-"
+                )}</div>
+                <div class="text-xs text-slate-400">${escapeHtml(
+                  p.recipientPhone || ""
+                )}</div>
+              </td>
+              <td class="py-2 px-3 text-sm">${escapeHtml(
+                p.addressLine || p.pickupAddress || p.address || "-"
+              )}</td>
+              <td class="py-2 px-3">${escapeHtml(p.status)}</td>
+              <td class="py-2 px-3 text-sm">${escapeHtml(p.eta || "")}</td>
+              <td class="py-2 px-3 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button class="btn btn-xs btn-ghost btn-center" data-id="${
+                    p.id
+                  }">Center</button>
+                  ${
+                    p.status === "PENDING_PICKUP"
+                      ? `<button class="btn btn-xs btn-primary btn-pickup" data-id="${p.id}">Picked up</button>`
+                      : ""
+                  }
+                  ${
+                    p.status === "IN_TRANSIT"
+                      ? `<button class="btn btn-xs btn-success btn-deliver" data-id="${p.id}">Delivered</button>`
+                      : ""
+                  }
+                  <button class="btn btn-xs btn-ghost btn-issue" data-id="${
+                    p.id
+                  }">Issue</button>
+                </div>
+              </td>
+            </tr>
+          `);
+            row.find(".btn-center").on("click", function () {
+              const id = $(this).data("id");
+              // if map integrated center on location
+              Swal.fire({
+                title: "Map",
+                text: `Would center map on parcel ${tracking}`,
+              });
+            });
+            row.find(".btn-pickup").on("click", async function () {
+              const id = $(this).data("id");
+              try {
+                const res = await fetch(
+                  `/api/driver/parcels/${encodeURIComponent(id)}/pickup`,
+                  {
+                    method: "POST",
+                    credentials: "include",
+                  }
+                );
+                const txt = await res.text();
+                if (!res.ok)
+                  throw new Error(
+                    (safeParse(txt) && safeParse(txt).message) ||
+                      "Failed to mark pickup"
+                  );
+                Swal.fire({ icon: "success", title: "Picked up" });
+                await loadAssigned($("#searchInput").val());
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            row.find(".btn-deliver").on("click", async function () {
+              const id = $(this).data("id");
+              const { value: signature } = await Swal.fire({
+                title: "Confirm delivery",
+                input: "text",
+                inputPlaceholder: "Enter recipient name or signature",
+                showCancelButton: true,
+              });
+              if (!signature) return;
+              try {
+                const res = await fetch(
+                  `/api/driver/parcels/${encodeURIComponent(id)}/deliver`,
+                  {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ recipient: signature }),
+                  }
+                );
+                const txt = await res.text();
+                if (!res.ok)
+                  throw new Error(
+                    (safeParse(txt) && safeParse(txt).message) ||
+                      "Failed to mark delivered"
+                  );
+                Swal.fire({ icon: "success", title: "Delivered" });
+                await loadAssigned($("#searchInput").val());
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            row.find(".btn-issue").on("click", async function () {
+              const id = $(this).data("id");
+              const { value: note } = await Swal.fire({
+                title: "Report issue",
+                input: "text",
+                inputPlaceholder: "Describe the issue",
+                showCancelButton: true,
+              });
+              if (!note) return;
+              try {
+                const res = await fetch(
+                  `/api/driver/parcels/${encodeURIComponent(id)}/report`,
+                  {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ note }),
+                  }
+                );
+                if (!res.ok) throw new Error("Failed to report");
+                Swal.fire({ icon: "success", title: "Reported" });
+                await loadAssigned($("#searchInput").val());
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            $tb.append(row);
+          });
+        }
+
+        function updateMetrics() {
+          const assignedCount = assigned.length;
+          const pickups = assigned.filter(
+            (p) => p.status === "PENDING_PICKUP"
+          ).length;
+          const pending = assigned.filter(
+            (p) => p.status !== "DELIVERED"
+          ).length;
+          $("#metricAssigned").text(assignedCount);
+          $("#metricPickups").text(pickups);
+          $("#metricPending").text(pending);
+        }
+
+        // Start route
+        $("#startRouteBtn").on("click", async function () {
+          try {
+            const res = await fetch("/api/driver/start-route", {
+              method: "POST",
+              credentials: "include",
+            });
+            const txt = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(txt) && safeParse(txt).message) ||
+                  "Failed to start route"
+              );
+            Swal.fire({ icon: "success", title: "Route started" });
+            // open route page
+            window.location.href = "route.html";
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Mark all delivered (bulk) - careful, this is a convenience for demo
+        $("#completeAllBtn").on("click", async function () {
+          const confirm = await Swal.fire({
+            title: "Mark all assigned as delivered?",
+            showCancelButton: true,
+            confirmButtonText: "Yes, mark delivered",
+          });
+          if (!confirm.isConfirmed) return;
+          try {
+            const ids = assigned.map((p) => p.id);
+            const res = await fetch("/api/driver/parcels/bulk-deliver", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ parcelIds: ids }),
+            });
+            const txt = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(txt) && safeParse(txt).message) || "Failed"
+              );
+            Swal.fire({ icon: "success", title: "All marked delivered" });
+            await loadAssigned($("#searchInput").val());
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Toggle online/offline
+        $("#toggleOnline").on("click", async function () {
+          try {
+            const action = online ? "go-offline" : "go-online";
+            const res = await fetch(`/api/driver/${action}`, {
+              method: "POST",
+              credentials: "include",
+            });
+            if (!res.ok) throw new Error("Failed");
+            online = !online;
+            $("#toggleOnline").text(online ? "Go Offline" : "Go Online");
+            $("#driverStatus").text(online ? "Online" : "Offline");
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Update location via browser geolocation
+        $("#updateLocationBtn").on("click", function () {
+          if (!navigator.geolocation)
+            return Swal.fire({
+              icon: "error",
+              title: "Geolocation not supported",
+            });
+          Swal.fire({
+            title: "Updating location…",
+            didOpen: () => Swal.showLoading(),
+          });
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              try {
+                const res = await fetch("/api/driver/location", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ latitude: lat, longitude: lon }),
+                });
+                if (!res.ok) throw new Error("Update failed");
+                Swal.fire({ icon: "success", title: "Location updated" });
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            },
+            (err) => {
+              Swal.fire({
+                icon: "error",
+                title: "Geolocation failed",
+                text: err.message || "",
+              });
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+          );
+        });
+
+        // Reporting issue
+        $("#reportBtn").on("click", async function () {
+          const { value: note } = await Swal.fire({
+            title: "Report issue to dispatch",
+            input: "text",
+            inputPlaceholder: "Describe the issue",
+            showCancelButton: true,
+          });
+          if (!note) return;
+          try {
+            const res = await fetch("/api/driver/report", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ note }),
+            });
+            if (!res.ok) throw new Error("Report failed");
+            Swal.fire({ icon: "success", title: "Reported" });
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Refresh button and search
+        $("#refreshBtn").on("click", function () {
+          loadAssigned($("#searchInput").val());
+        });
+        $("#searchInput").on("keypress", function (e) {
+          if (e.key === "Enter") loadAssigned($(this).val());
+        });
+
+        // initial load + polling
+        async function start() {
+          await loadAssigned();
+          // lightweight polling for new assignments every 20s
+          polling = setInterval(loadAssigned, 20000);
+          // load driver info / metrics endpoint
+          try {
+            const res = await fetch("/api/driver/me", {
+              credentials: "include",
+            });
+            const txt = await res.text();
+            if (res.ok) {
+              const json = safeParse(txt);
+              if (json && json.status) {
+                online = json.online || false;
+                $("#toggleOnline").text(online ? "Go Offline" : "Go Online");
+                $("#driverStatus").text(online ? "Online" : "Offline");
+              }
+            }
+          } catch (err) {
+            /* ignore */
+          }
+        }
+
+        // activity log helper
+        function pushActivity(text) {
+          const time = new Date().toLocaleTimeString();
+          $("#activityList").prepend(
+            `<li><div class="text-xs text-slate-400">${time}</div><div>${escapeHtml(
+              text
+            )}</div></li>`
+          );
+        }
+
+        // start page
+        $(function () {
+          start();
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

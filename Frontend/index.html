@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="GoLanka Courier — parcel delivery platform for Sri Lanka (customers, drivers, staff, admins)"
+    />
+    <title>GoLanka Courier — Fast parcel delivery across Sri Lanka</title>
+    <link rel="icon" href="/assets/images/logo.png" />
+
+    <!-- Tailwind CDN (no build step). We enable dark mode via 'class'. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind config for custom colors & dark mode via class
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: "#0ea5a4", 700: "#089e9b" },
+              accent: { DEFAULT: "#ffb020" },
+            },
+            animation: {
+              "slide-up": "slideUp 220ms cubic-bezier(.2,.9,.3,1)",
+              "rotate-toggle": "rotateToggle 0.5s ease-in-out",
+            },
+            keyframes: {
+              slideUp: {
+                "0%": { transform: "translateY(6px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              rotateToggle: {
+                "0%": { transform: "rotate(0deg)" },
+                "100%": { transform: "rotate(360deg)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Project CSS (Tailwind utilities + small token file + animations) -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+
+    <!-- jQuery + SweetAlert2 (CDN) -->
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity=""
+      crossorigin="anonymous"
+    ></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Small inline styles for accessibility focus rings & minor layout -->
+    <style>
+      :root {
+        --container: 1200px;
+      }
+      .container {
+        max-width: var(--container);
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .btn {
+        @apply inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium;
+      }
+      .btn-primary {
+        @apply bg-primary text-white hover:bg-primary-700;
+      }
+      .btn-outline {
+        @apply border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-black/40;
+      }
+      .input {
+        @apply w-full rounded-md border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary;
+      }
+      .avatar {
+        @apply w-8 h-8 rounded-full object-cover;
+      }
+      /* Theme toggle button styles */
+      .theme-toggle {
+        @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-200 transition-all duration-300;
+      }
+      .theme-toggle:hover {
+        @apply bg-gray-300 dark:bg-gray-600;
+      }
+      /* Very small fallback for browsers that don't support tailwind directives in <style> */
+    </style>
+  </head>
+  <body
+    class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <!-- Header will be loaded here by jQuery -->
+    <div id="site-header" role="banner">
+      <!-- Adding a custom header with theme toggle button -->
+      <header
+        class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 py-4"
+      >
+        <div class="container flex justify-between items-center">
+          <a href="/" class="font-bold text-xl flex items-center">
+            <img
+              src="/assets/images/logo.png"
+              alt="GoLanka Courier"
+              class="w-8 h-8 mr-2"
+            />
+            GoLanka Courier
+          </a>
+
+          <div class="flex items-center gap-4">
+            <nav class="hidden md:flex items-center gap-6">
+              <a
+                href="pages/create-parcel.html"
+                class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
+                >Create Parcel</a
+              >
+              <a
+                href="pages/parcel-tracking.html"
+                class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
+                >Track Parcel</a
+              >
+              <a
+                href="pages/pricing.html"
+                class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
+                >Pricing</a
+              >
+            </nav>
+
+            <button
+              id="theme-toggle"
+              class="theme-toggle"
+              aria-label="Toggle dark mode"
+            >
+              <!-- Sun icon for light mode -->
+              <svg
+                class="w-5 h-5 hidden dark:block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                ></path>
+              </svg>
+              <!-- Moon icon for dark mode -->
+              <svg
+                class="w-5 h-5 block dark:hidden"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+
+            <div class="flex items-center gap-2 ml-2">
+              <a href="pages/auth/login.html" class="btn btn-outline text-sm"
+                >Log in</a
+              >
+              <a href="pages/auth/signup.html" class="btn btn-primary text-sm"
+                >Sign up</a
+              >
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <!-- Main content -->
+    <main id="main" class="mt-6" role="main">
+      <!-- HERO -->
+      <section
+        class="hero bg-gradient-to-r from-white to-slate-50 dark:from-gray-900 dark:to-gray-800"
+      >
+        <div
+          class="container py-14 grid grid-cols-1 md:grid-cols-2 gap-10 items-center"
+        >
+          <div>
+            <h1
+              class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight"
+            >
+              GoLanka Courier — Fast, reliable parcel delivery across Sri Lanka
+            </h1>
+            <p class="mt-4 text-lg text-muted max-w-xl">
+              Send parcels with confidence. Track in real time. Dedicated apps
+              for customers, drivers, staff and admins.
+            </p>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a href="pages\auth\signup.html" class="btn btn-primary"
+                >Get Started — Sign up</a
+              >
+              <a href="pages/create-parcel.html" class="btn btn-outline"
+                >Create Parcel</a
+              >
+              <a href="pages/parcel-tracking.html" class="btn btn-outline"
+                >Track Parcel</a
+              >
+            </div>
+
+            <ul class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <li class="flex items-start gap-2">
+                <span
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-primary/10 text-primary"
+                  >✓</span
+                >
+                <div>
+                  <div class="font-medium">Nationwide coverage</div>
+                  <div class="text-muted text-xs">
+                    Coverage across cities & rural areas
+                  </div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-accent/10 text-accent"
+                  >⚡</span
+                >
+                <div>
+                  <div class="font-medium">Real-time tracking</div>
+                  <div class="text-muted text-xs">
+                    Know where your parcel is, always
+                  </div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-green-100 text-green-700"
+                  >🔒</span
+                >
+                <div>
+                  <div class="font-medium">Secure payments</div>
+                  <div class="text-muted text-xs">
+                    Integration with PayHere (sandbox)
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right column: quick tracking card + role cards -->
+          <div>
+            <div
+              class="card p-5 shadow-sm bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
+            >
+              <h3 class="text-lg font-semibold">Quick parcel tracking</h3>
+              <p class="text-sm text-muted mt-1">
+                Enter tracking number to see status
+              </p>
+
+              <form
+                id="track-form"
+                class="mt-4 grid grid-cols-1 gap-3"
+                aria-label="Track parcel"
+              >
+                <label for="trackingNumber" class="sr-only"
+                  >Tracking number</label
+                >
+                <input
+                  id="trackingNumber"
+                  name="trackingNumber"
+                  type="text"
+                  class="input"
+                  placeholder="e.g. GOL-1234-5678"
+                  required
+                  aria-required="true"
+                />
+
+                <div class="flex items-center gap-2">
+                  <button type="submit" class="btn btn-primary">Track</button>
+                  <button type="button" id="track-demo" class="btn btn-outline">
+                    Use demo number
+                  </button>
+                </div>
+
+                <div
+                  id="track-result"
+                  class="hidden mt-3"
+                  aria-live="polite"
+                ></div>
+              </form>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <a
+                href="pages/dashboard-customer.html"
+                class="card p-4 text-center hover:shadow-md"
+              >
+                <div class="text-xl font-semibold">Customer</div>
+                <div class="text-sm text-muted mt-1">
+                  Create & manage parcels
+                </div>
+              </a>
+              <a
+                href="pages/dashboard-driver.html"
+                class="card p-4 text-center hover:shadow-md"
+              >
+                <div class="text-xl font-semibold">Driver</div>
+                <div class="text-sm text-muted mt-1">Pickups & deliveries</div>
+              </a>
+              <a
+                href="pages/dashboard-staff.html"
+                class="card p-4 text-center hover:shadow-md"
+              >
+                <div class="text-xl font-semibold">Staff</div>
+                <div class="text-sm text-muted mt-1">Operations dashboard</div>
+              </a>
+              <a
+                href="pages/dashboard-admin.html"
+                class="card p-4 text-center hover:shadow-md"
+              >
+                <div class="text-xl font-semibold">Admin</div>
+                <div class="text-sm text-muted mt-1">
+                  Manage users & settings
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section class="container py-12" aria-labelledby="features-heading">
+        <h2 id="features-heading" class="text-2xl font-bold">
+          Why choose GoLanka?
+        </h2>
+        <div class="grid md:grid-cols-3 gap-6 mt-6">
+          <article class="card p-6">
+            <h3 class="font-semibold">Simple Pricing</h3>
+            <p class="text-sm text-muted mt-2">
+              Transparent pricing and instant quotes for every parcel size.
+            </p>
+          </article>
+          <article class="card p-6">
+            <h3 class="font-semibold">Driver-friendly</h3>
+            <p class="text-sm text-muted mt-2">
+              Driver app optimised for route efficiency and safety.
+            </p>
+          </article>
+          <article class="card p-6">
+            <h3 class="font-semibold">Secure & reliable</h3>
+            <p class="text-sm text-muted mt-2">
+              Encrypted tokens, secure webhooks and robust retries.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section class="bg-slate-50 dark:bg-gray-800 py-12">
+        <div class="container">
+          <h2 class="text-2xl font-bold">How it works</h2>
+          <ol class="mt-6 grid md:grid-cols-4 gap-6 list-decimal list-inside">
+            <li class="card p-4">Sign up — create account</li>
+            <li class="card p-4">Create parcel & pay</li>
+            <li class="card p-4">Driver pickup & update</li>
+            <li class="card p-4">Delivery & confirmation</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="container py-12 text-center">
+        <div class="max-w-2xl mx-auto">
+          <h3 class="text-xl font-semibold">Ready to ship?</h3>
+          <p class="text-muted mt-2">
+            Sign up and start sending parcels across Sri Lanka today.
+          </p>
+          <div class="mt-4 flex justify-center gap-3">
+            <a href="pages\auth\signup.html" class="btn btn-primary"
+              >Create Account</a
+            >
+            <a href="pages/pricing.html" class="btn btn-outline">See Pricing</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <div id="site-footer" role="contentinfo" class="mt-12">
+      <footer
+        class="bg-gray-100 dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700"
+      >
+        <div class="container">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h4 class="font-semibold mb-4">GoLanka Courier</h4>
+              <p class="text-sm text-muted">
+                Fast, reliable parcel delivery across Sri Lanka
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Services</h4>
+              <ul class="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Parcel Delivery</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Express Service</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >International</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Company</h4>
+              <ul class="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >About Us</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Careers</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Contact</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Legal</h4>
+              <ul class="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Terms</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Privacy</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-muted hover:text-primary transition-colors"
+                    >Cookies</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div
+            class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-muted"
+          >
+            © 2023 GoLanka Courier. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Recommended external script files (kept last for progressive enhancement) -->
+    <script>
+      // Helper: page functionality - header/footer loading handled by main.js
+      (function ($) {
+        $(function () {
+          // Note: Header/footer loading removed to prevent conflicts with main.js
+
+          // Simple track form AJAX demo
+          $("#track-form").on("submit", function (ev) {
+            ev.preventDefault();
+            const number = $("#trackingNumber").val()?.trim();
+            if (!number) {
+              Swal.fire({ icon: "warning", title: "Enter tracking number" });
+              return;
+            }
+
+            // show spinner
+            $("#track-result")
+              .removeClass("hidden")
+              .html('<div class="text-sm text-muted">Searching…</div>');
+
+            // Example AJAX: POST to your backend tracking endpoint
+            // Replace URL with your real API endpoint, and include auth headers if needed.
+            $.ajax({
+              url: "/api/track",
+              method: "GET",
+              data: { q: number },
+              timeout: 8000,
+              success: function (res) {
+                // Expect res to contain { status, location, ETA } — adapt as needed.
+                const html = `
+                <div class="mt-2 text-sm">
+                  <div><strong>Status:</strong> ${
+                    res?.status || "Unknown"
+                  }</div>
+                  <div><strong>Last seen:</strong> ${
+                    res?.location || "N/A"
+                  }</div>
+                  <div><strong>ETA:</strong> ${res?.eta || "—"}</div>
+                </div>
+              `;
+                $("#track-result").html(html);
+              },
+              error: function (xhr, status) {
+                $("#track-result").html(
+                  '<div class="text-sm text-red-500">Unable to fetch tracking data. Try again later.</div>'
+                );
+              },
+            });
+          });
+
+          // Demo: prefill demo number
+          $("#track-demo").on("click", function () {
+            $("#trackingNumber").val("GOL-DEMO-0001").trigger("focus");
+          });
+
+          // Theme toggle functionality
+          const themeToggle = document.getElementById("theme-toggle");
+          const htmlElement = document.documentElement;
+
+          // Check for saved theme preference or use system preference
+          const savedTheme =
+            localStorage.getItem("theme") ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+
+          // Apply the saved theme
+          if (savedTheme === "dark") {
+            htmlElement.classList.add("dark");
+          } else {
+            htmlElement.classList.remove("dark");
+          }
+
+          // Toggle theme on button click
+          themeToggle.addEventListener("click", function () {
+            // Add animation class
+            themeToggle.classList.add("animate-rotate-toggle");
+
+            // Toggle dark class
+            htmlElement.classList.toggle("dark");
+
+            // Save preference
+            const isDark = htmlElement.classList.contains("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+
+            // Remove animation class after animation completes
+            setTimeout(() => {
+              themeToggle.classList.remove("animate-rotate-toggle");
+            }, 500);
+          });
+        });
+      })(jQuery);
+    </script>
+
+    <!-- Hook to your project's JS files (if you have them). These should provide richer behavior (apiFetch, auth flows, token refresh, role guards, polling). -->
+    <script src="js/script.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/notifications.js" defer></script>
+  </body>
+</html>

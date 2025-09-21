@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign up — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- jQuery (used for convenience) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+
+    <script>
+      // Helpful page-level config (override if needed)
+      window.COMPONENTS_BASE = "../../";
+      window.API_BASE = window.API_BASE || "http://localhost:8080";
+    </script>
+  </head>
+
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4"
+  >
+    <main
+      class="max-w-3xl w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden"
+    >
+      <div class="md:flex">
+        <section
+          class="hidden md:block md:w-1/2 bg-gradient-to-br from-indigo-600 to-indigo-400 p-8"
+        >
+          <div class="text-white">
+            <h1 class="text-3xl font-extrabold mb-2">Welcome to GoLanka</h1>
+            <p class="opacity-90">
+              Fast, reliable parcel delivery across Sri Lanka. Sign up to send
+              and receive parcels.
+            </p>
+            <p class="mt-6 text-sm opacity-90">
+              If you are a driver and want to work with us, choose "Driver"
+              below and submit a driver request — our staff will review and
+              approve it.
+            </p>
+          </div>
+        </section>
+
+        <section class="w-full md:w-1/2 p-8">
+          <header class="mb-6">
+            <h2 class="text-2xl font-bold">Create an account</h2>
+            <p class="text-sm text-slate-500 mt-1">
+              Choose Customer (instant) or Driver (request submission).
+            </p>
+          </header>
+
+          <form id="signupForm" novalidate class="space-y-4">
+            <div class="grid grid-cols-1 gap-3">
+              <fieldset class="mb-2">
+                <legend class="text-sm font-medium mb-2">Account type</legend>
+                <div class="flex items-center gap-4">
+                  <label class="inline-flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="customer"
+                      checked
+                    />
+                    <span>Customer</span>
+                  </label>
+                  <label class="inline-flex items-center gap-2">
+                    <input type="radio" name="accountType" value="driver" />
+                    <span>Driver (request)</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <label class="block">
+                <span class="text-sm font-medium">Full name</span>
+                <input
+                  required
+                  name="fullName"
+                  type="text"
+                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  placeholder="Alice Perera"
+                />
+                <p
+                  class="text-xs text-red-500 mt-1 hidden field-error"
+                  data-field="fullName"
+                ></p>
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium">Email</span>
+                <input
+                  required
+                  name="email"
+                  type="email"
+                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  placeholder="alice@example.com"
+                />
+                <p
+                  class="text-xs text-red-500 mt-1 hidden field-error"
+                  data-field="email"
+                ></p>
+              </label>
+
+              <div class="grid grid-cols-2 gap-3">
+                <label class="block">
+                  <span class="text-sm font-medium">Password</span>
+                  <input
+                    required
+                    name="password"
+                    type="password"
+                    minlength="8"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="At least 8 characters"
+                  />
+                  <p
+                    class="text-xs text-red-500 mt-1 hidden field-error"
+                    data-field="password"
+                  ></p>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm font-medium">Confirm password</span>
+                  <input
+                    required
+                    name="confirmPassword"
+                    type="password"
+                    minlength="8"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="Confirm password"
+                  />
+                  <p
+                    class="text-xs text-red-500 mt-1 hidden field-error"
+                    data-field="confirmPassword"
+                  ></p>
+                </label>
+              </div>
+
+              <label class="block">
+                <span class="text-sm font-medium">Phone</span>
+                <input
+                  name="phone"
+                  type="tel"
+                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  placeholder="+94771234567"
+                />
+                <p
+                  class="text-xs text-red-500 mt-1 hidden field-error"
+                  data-field="phone"
+                ></p>
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium">Address (single-line)</span>
+                <input
+                  name="address"
+                  type="text"
+                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  placeholder="No 12, Baker Street, Colombo"
+                />
+                <p
+                  class="text-xs text-red-500 mt-1 hidden field-error"
+                  data-field="address"
+                ></p>
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium">Address line (optional)</span>
+                <input
+                  name="addressLine"
+                  type="text"
+                  class="w-full rounded-md border px-3 py-2 mt-1"
+                  placeholder="No 12, Baker Street"
+                />
+              </label>
+
+              <div class="grid grid-cols-2 gap-3">
+                <label class="block">
+                  <span class="text-sm font-medium">City</span>
+                  <input
+                    name="city"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="Colombo"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-sm font-medium">Province</span>
+                  <input
+                    name="province"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="Western"
+                  />
+                </label>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <label class="block">
+                  <span class="text-sm font-medium">Country</span>
+                  <input
+                    name="country"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="Sri Lanka"
+                    value="Sri Lanka"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-sm font-medium">Postal code</span>
+                  <input
+                    name="postalCode"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="10000"
+                  />
+                </label>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <label class="block">
+                  <span class="text-sm font-medium">Latitude</span>
+                  <input
+                    name="latitude"
+                    type="number"
+                    step="any"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="6.927079"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-sm font-medium">Longitude</span>
+                  <input
+                    name="longitude"
+                    type="number"
+                    step="any"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="79.861244"
+                  />
+                </label>
+              </div>
+
+              <!-- Driver-only fields (hidden unless Driver selected) -->
+              <div
+                id="driverFields"
+                class="hidden space-y-3 border border-dashed rounded-md p-3"
+              >
+                <div class="text-sm font-medium">
+                  Driver information (for driver requests)
+                </div>
+
+                <label class="block">
+                  <span class="text-sm">National ID / NIC</span>
+                  <input
+                    name="nic"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="#########V"
+                  />
+                  <p
+                    class="text-xs text-red-500 mt-1 hidden field-error"
+                    data-field="nic"
+                  ></p>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm">Driver's license number</span>
+                  <input
+                    name="licenseNumber"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="DL-123456"
+                  />
+                  <p
+                    class="text-xs text-red-500 mt-1 hidden field-error"
+                    data-field="licenseNumber"
+                  ></p>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm">Vehicle registration number</span>
+                  <input
+                    name="vehicleNumber"
+                    type="text"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="WP-ABC-1234"
+                  />
+                  <p
+                    class="text-xs text-red-500 mt-1 hidden field-error"
+                    data-field="vehicleNumber"
+                  ></p>
+                </label>
+
+                <label class="block">
+                  <span class="text-sm">Additional note (optional)</span>
+                  <textarea
+                    name="driverNote"
+                    rows="2"
+                    class="w-full rounded-md border px-3 py-2 mt-1"
+                    placeholder="Any additional info for your driver request"
+                  ></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4">
+              <button
+                id="signupBtn"
+                type="submit"
+                class="w-full inline-flex items-center justify-center rounded-md bg-indigo-600 text-white px-4 py-2 font-medium"
+              >
+                Create account / Submit request
+              </button>
+            </div>
+
+            <p class="text-sm text-slate-500">
+              Already registered?
+              <a href="signin.html" class="text-indigo-600 underline"
+                >Sign in</a
+              >
+            </p>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <!-- Load API helper (script.js should define window.GoLankaApi) -->
+    <script src="../../js/script.js" defer></script>
+    <script src="../../js/notifications.js" defer></script>
+    <script src="../../js/main.js" defer></script>
+    <script src="../../js/auth.js" defer></script>
+
+    <script>
+      (function ($, Swal) {
+        "use strict";
+        const $form = $("#signupForm");
+        const $btn = $("#signupBtn");
+        const $driverFields = $("#driverFields");
+
+        function clearFieldErrors() {
+          $form.find(".field-error").each(function () {
+            $(this).addClass("hidden").text("");
+          });
+          $form.find(".is-invalid").removeClass("is-invalid");
+        }
+
+        function showFieldError(field, message) {
+          const $el = $form.find(`.field-error[data-field="${field}"]`);
+          if ($el.length) {
+            $el.removeClass("hidden").text(message);
+            // mark input invalid if present
+            const $input = $form.find(`[name="${field}"]`);
+            if ($input.length) $input.addClass("is-invalid");
+          } else {
+            // fallback toast
+            if (window.GoLankaApi && GoLankaApi.toast) {
+              GoLankaApi.toast({ title: message, icon: "error", toast: true });
+            } else {
+              console.warn(field, message);
+            }
+          }
+        }
+
+        // show/hide driver fields based on radio
+        function wireAccountTypeToggle() {
+          $form.find('[name="accountType"]').on("change", function () {
+            const v = $form.find('[name="accountType"]:checked').val();
+            if (v === "driver") {
+              $driverFields.removeClass("hidden");
+            } else {
+              $driverFields.addClass("hidden");
+            }
+          });
+          // initial
+          const initial = $form.find('[name="accountType"]:checked').val();
+          if (initial === "driver") $driverFields.removeClass("hidden");
+        }
+
+        // POST helper: prefer GoLankaApi.apiJson when available
+        async function postJson(path, body) {
+          if (
+            window.GoLankaApi &&
+            typeof window.GoLankaApi.apiJson === "function"
+          ) {
+            return window.GoLankaApi.apiJson(path, { method: "POST", body });
+          }
+          const base = (window.API_BASE || "").replace(/\/+$/, "");
+          const url = path.startsWith("http")
+            ? path
+            : base
+            ? base + path
+            : path;
+          const res = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+          const text = await res.text().catch(() => "");
+          let json = null;
+          try {
+            json = text ? JSON.parse(text) : null;
+          } catch (e) {
+            json = null;
+          }
+          if (!res.ok) throw { status: res.status, body: json || text };
+          return json;
+        }
+
+        $form.on("submit", async function (e) {
+          e.preventDefault();
+          clearFieldErrors();
+          $btn.prop("disabled", true).text("Submitting...");
+
+          // collect values
+          const fd = new FormData($form[0]);
+          const accountType = (
+            fd.get("accountType") || "customer"
+          ).toLowerCase();
+          const payload = {
+            fullName: (fd.get("fullName") || "").trim(),
+            email: (fd.get("email") || "").trim(),
+            password: fd.get("password") || "",
+            confirmPassword: fd.get("confirmPassword") || "",
+            phone: (fd.get("phone") || "").trim() || null,
+            address: (fd.get("address") || "").trim() || null,
+            addressLine: (fd.get("addressLine") || "").trim() || null,
+            city: (fd.get("city") || "").trim() || null,
+            province: (fd.get("province") || "").trim() || null,
+            country: (fd.get("country") || "").trim() || null,
+            postalCode: (fd.get("postalCode") || "").trim() || null,
+            latitude: null,
+            longitude: null,
+          };
+
+          // parse floats
+          const latRaw = (fd.get("latitude") || "").toString().trim();
+          const lonRaw = (fd.get("longitude") || "").toString().trim();
+          if (latRaw !== "") {
+            const n = Number(latRaw);
+            payload.latitude = Number.isFinite(n) ? n : null;
+          }
+          if (lonRaw !== "") {
+            const n = Number(lonRaw);
+            payload.longitude = Number.isFinite(n) ? n : null;
+          }
+
+          // driver-specific
+          if (accountType === "driver") {
+            payload.nic = (fd.get("nic") || "").trim() || null;
+            payload.licenseNumber =
+              (fd.get("licenseNumber") || "").trim() || null;
+            payload.vehicleNumber =
+              (fd.get("vehicleNumber") || "").trim() || null;
+            payload.driverNote = (fd.get("driverNote") || "").trim() || null;
+          }
+
+          // client-side validation
+          const clientErrors = [];
+          if (!payload.fullName)
+            clientErrors.push({
+              field: "fullName",
+              message: "Full name is required",
+            });
+          if (!payload.email)
+            clientErrors.push({ field: "email", message: "Email is required" });
+          if (!payload.address)
+            clientErrors.push({
+              field: "address",
+              message: "Address is required",
+            });
+          if (!payload.password)
+            clientErrors.push({
+              field: "password",
+              message: "Password is required",
+            });
+          if (!payload.confirmPassword)
+            clientErrors.push({
+              field: "confirmPassword",
+              message: "Confirm password required",
+            });
+          if (payload.password && payload.password.length < 8)
+            clientErrors.push({
+              field: "password",
+              message: "Password must be at least 8 characters",
+            });
+          if (payload.password !== payload.confirmPassword)
+            clientErrors.push({
+              field: "confirmPassword",
+              message: "Passwords do not match",
+            });
+
+          if (accountType === "driver") {
+            // driver request: require NIC and license minimally
+            if (!payload.nic)
+              clientErrors.push({
+                field: "nic",
+                message: "NIC is required for driver requests",
+              });
+            if (!payload.licenseNumber)
+              clientErrors.push({
+                field: "licenseNumber",
+                message: "Driver license number is required",
+              });
+          }
+
+          if (clientErrors.length) {
+            clientErrors.forEach((err) =>
+              showFieldError(err.field, err.message)
+            );
+            $btn
+              .prop("disabled", false)
+              .text("Create account / Submit request");
+            return;
+          }
+
+          try {
+            if (accountType === "customer") {
+              // standard signup
+              const resp = await postJson("/api/auth/signup/customer", payload);
+              await Swal.fire({
+                icon: "success",
+                title: "Registration successful",
+                text:
+                  resp && resp.message
+                    ? resp.message
+                    : "Check your email for verification instructions.",
+              });
+              // save email to prefill verify form (optional)
+              try {
+                sessionStorage.setItem("preVerifyEmail", payload.email);
+              } catch (ignore) {}
+              // redirect to verify or signin
+              window.location.href = "/pages/auth/verify-email.html";
+            } else {
+              // driver request path - backend should accept driver signup request for manual approval
+              // endpoint name may differ on your server. Adjust if needed.
+              // We'll call /api/auth/signup/driver-request
+              const resp = await postJson(
+                "/api/auth/signup/driver-request",
+                payload
+              );
+              await Swal.fire({
+                icon: "success",
+                title: "Driver request submitted",
+                text:
+                  resp && resp.message
+                    ? resp.message
+                    : "Your driver application has been submitted and will be reviewed.",
+              });
+              // redirect to signin or a thank-you page
+              window.location.href = "/pages/auth/signin.html";
+            }
+          } catch (err) {
+            console.error("Signup error", err);
+            // handle structured errors { status, body }
+            if (err && err.body) {
+              const body = err.body;
+              // backend may return validationErrors array
+              if (
+                Array.isArray(body.validationErrors) &&
+                body.validationErrors.length
+              ) {
+                body.validationErrors.forEach((e) => {
+                  showFieldError(e.field || "", e.message || JSON.stringify(e));
+                });
+                await Swal.fire(
+                  "Validation error",
+                  "Fix highlighted fields and retry",
+                  "error"
+                );
+              } else if (body.message) {
+                await Swal.fire("Error", body.message, "error");
+              } else {
+                await Swal.fire(
+                  "Error",
+                  "Registration failed. See console for details.",
+                  "error"
+                );
+              }
+            } else if (err && err.status) {
+              await Swal.fire(
+                "Error",
+                `Request failed (${err.status})`,
+                "error"
+              );
+            } else if (err instanceof Error) {
+              await Swal.fire("Error", err.message, "error");
+            } else {
+              await Swal.fire("Error", "An unexpected error occurred", "error");
+            }
+          } finally {
+            $btn
+              .prop("disabled", false)
+              .text("Create account / Submit request");
+          }
+        });
+
+        // init
+        $(function () {
+          wireAccountTypeToggle();
+          clearFieldErrors();
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

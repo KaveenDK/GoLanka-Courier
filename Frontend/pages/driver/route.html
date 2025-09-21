@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Driver Route — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN (dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Leaflet CDN (optional map integration) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity=""
+      crossorigin=""
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+    <style>
+      /* small map container fallback height */
+      #map {
+        height: 70vh;
+        min-height: 420px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header -->
+    <div id="header-placeholder" role="banner"></div>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Route Planner</h1>
+          <p class="text-sm text-slate-500">
+            Turn-by-turn stops for active route. Tap a stop to mark complete.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="dashboard.html" class="btn btn-ghost">Back to Dashboard</a>
+          <button id="recalcBtn" class="btn btn-primary">Recalculate</button>
+          <button id="finishRouteBtn" class="btn btn-danger">
+            Finish Route
+          </button>
+        </div>
+      </div>
+
+      <section class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="lg:col-span-3 space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-3">
+            <div id="map" class="rounded"></div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h3 class="font-semibold mb-3">Directions / Notes</h3>
+            <ol
+              id="directionsList"
+              class="list-decimal ml-5 text-sm text-slate-700 dark:text-slate-300 space-y-3"
+            >
+              <li class="text-slate-400">Loading route…</li>
+            </ol>
+          </div>
+        </div>
+
+        <aside class="space-y-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Stops</h4>
+            <ul
+              id="stopsList"
+              class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300"
+            >
+              <li class="text-xs text-slate-400">Loading stops…</li>
+            </ul>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Route summary</h4>
+            <div
+              id="routeSummary"
+              class="mt-2 text-sm text-slate-600 dark:text-slate-300"
+            >
+              <div>Stops: <span id="summaryStops">—</span></div>
+              <div>Distance: <span id="summaryDistance">—</span></div>
+              <div>Estimated time: <span id="summaryTime">—</span></div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+            <h4 class="font-semibold">Actions</h4>
+            <div class="mt-3 space-y-2">
+              <button id="navToNextBtn" class="btn btn-primary w-full">
+                Navigate to Next
+              </button>
+              <button id="markStopBtn" class="btn btn-ghost w-full">
+                Mark Current Stop Complete
+              </button>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <div id="footer-placeholder" role="contentinfo"></div>
+
+    <!-- Shared script -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/driver.js"></script>
+
+    <!-- Page script: route behaviors using Leaflet (fallback if not integrated) -->
+    <script>
+      (function ($, Swal) {
+        function safeParse(t) {
+          try {
+            return t ? JSON.parse(t) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        function escapeHtml(s) {
+          if (s === undefined || s === null) return "";
+          return String(s).replace(
+            /[&<>"'`]/g,
+            (m) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+                "`": "&#96;",
+              }[m])
+          );
+        }
+
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+
+        let map = null;
+        let markers = [];
+        let polyline = null;
+        let stops = []; // stops = [{id, trackingId, lat, lon, address, status, eta, notes}]
+        let currentIndex = 0;
+
+        async function loadRoute() {
+          $("#stopsList").html(
+            '<li class="text-xs text-slate-400">Loading stops…</li>'
+          );
+          $("#directionsList").html(
+            '<li class="text-xs text-slate-400">Loading directions…</li>'
+          );
+          try {
+            const res = await fetch("/api/driver/route", {
+              credentials: "include",
+            });
+            const text = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(text) && safeParse(text).message) ||
+                  "Failed to load route"
+              );
+            const json = safeParse(text) || {};
+            stops = json.stops || [];
+            renderStops();
+            renderRouteOnMap();
+            updateSummary(json.summary || {});
+          } catch (err) {
+            $("#stopsList").html(
+              '<li class="text-xs text-red-500">Failed to load stops</li>'
+            );
+            $("#directionsList").html(
+              '<li class="text-xs text-red-500">Failed to load directions</li>'
+            );
+            console.error("loadRoute", err);
+          }
+        }
+
+        function renderStops() {
+          const $ul = $("#stopsList").empty();
+          if (!stops.length) {
+            $ul.append(
+              '<li class="text-xs text-slate-400">No stops in route</li>'
+            );
+            return;
+          }
+          stops.forEach((s, idx) => {
+            const cls =
+              s.status === "COMPLETED" ? "line-through opacity-60" : "";
+            const li = $(`
+            <li class="flex items-start justify-between gap-3">
+              <div>
+                <div class="font-medium ${cls}">${escapeHtml(
+              s.trackingId || "#" + s.id
+            )}</div>
+                <div class="text-xs text-slate-500 ${cls}">${escapeHtml(
+              s.address
+            )}</div>
+                <div class="text-xs text-slate-400">${escapeHtml(
+                  s.notes || ""
+                )}</div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <div class="text-xs text-slate-400">${escapeHtml(
+                  s.eta || ""
+                )}</div>
+                <div>
+                  <button class="btn btn-xs btn-ghost gotoStop" data-idx="${idx}">Go</button>
+                  <button class="btn btn-xs btn-success markStop" data-idx="${idx}" ${
+              s.status === "COMPLETED" ? "disabled" : ""
+            }>Complete</button>
+                </div>
+              </div>
+            </li>
+          `);
+            li.find(".gotoStop").on("click", function () {
+              const i = +$(this).data("idx");
+              focusStop(i);
+            });
+            li.find(".markStop").on("click", async function () {
+              const i = +$(this).data("idx");
+              try {
+                const stop = stops[i];
+                const res = await fetch(
+                  `/api/driver/route/stop/${encodeURIComponent(
+                    stop.id
+                  )}/complete`,
+                  {
+                    method: "POST",
+                    credentials: "include",
+                  }
+                );
+                if (!res.ok) throw new Error("Failed");
+                Swal.fire({ icon: "success", title: "Marked complete" });
+                await loadRoute();
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            $ul.append(li);
+          });
+        }
+
+        function updateSummary(summary) {
+          $("#summaryStops").text(summary.stops || stops.length || 0);
+          $("#summaryDistance").text(
+            summary.distance || summary.totalDistance || "—"
+          );
+          $("#summaryTime").text(summary.time || summary.estimatedTime || "—");
+        }
+
+        function renderRouteOnMap() {
+          // initialize map if needed
+          if (!map) {
+            map = L.map("map", { zoomControl: true });
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              maxZoom: 19,
+              attribution: "&copy; OpenStreetMap",
+            }).addTo(map);
+          }
+
+          // clear previous markers/polylines
+          markers.forEach((m) => map.removeLayer(m));
+          markers = [];
+          if (polyline) {
+            map.removeLayer(polyline);
+            polyline = null;
+          }
+
+          // gather latlngs
+          const latlngs = [];
+          stops.forEach((s, idx) => {
+            if (s.latitude == null || s.longitude == null) return;
+            const ll = [s.latitude, s.longitude];
+            latlngs.push(ll);
+            const marker = L.marker(ll)
+              .addTo(map)
+              .bindPopup(
+                `<strong>${escapeHtml(
+                  s.trackingId || "#" + s.id
+                )}</strong><br/>${escapeHtml(s.address || "")}`
+              );
+            markers.push(marker);
+            marker.on("click", function () {
+              currentIndex = idx;
+              highlightStop(idx);
+            });
+          });
+
+          if (latlngs.length) {
+            polyline = L.polyline(latlngs, { color: "#2563eb" }).addTo(map);
+            map.fitBounds(polyline.getBounds().pad(0.2));
+          } else {
+            // no coords - center to Sri Lanka
+            map.setView([6.9271, 79.8612], 10);
+          }
+
+          buildDirectionsFromStops();
+        }
+
+        function buildDirectionsFromStops() {
+          // Placeholder directions: list addresses in order
+          const $ol = $("#directionsList").empty();
+          if (!stops.length) {
+            $ol.append('<li class="text-xs text-slate-400">No directions</li>');
+            return;
+          }
+          stops.forEach((s, idx) => {
+            $ol.append(
+              `<li>${escapeHtml(
+                s.address || s.notes || "Stop " + (idx + 1)
+              )}</li>`
+            );
+          });
+        }
+
+        function focusStop(i) {
+          if (!markers[i]) return;
+          markers[i].openPopup();
+          map.setView(markers[i].getLatLng(), 15, { animate: true });
+          currentIndex = i;
+        }
+
+        function highlightStop(i) {
+          currentIndex = i;
+          // optional: change marker icon or open popup
+          if (markers[i]) markers[i].openPopup();
+        }
+
+        // Nav to next (open device/default maps app)
+        $("#navToNextBtn").on("click", function () {
+          if (!stops.length)
+            return Swal.fire({ icon: "info", title: "No stops" });
+          const stop = stops[currentIndex] || stops[0];
+          if (!stop || stop.latitude == null)
+            return Swal.fire({
+              icon: "error",
+              title: "No coordinates available",
+            });
+          const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+            stop.latitude + "," + stop.longitude
+          )}`;
+          window.open(url, "_blank");
+        });
+
+        // Mark current stop complete
+        $("#markStopBtn").on("click", async function () {
+          const stop = stops[currentIndex];
+          if (!stop)
+            return Swal.fire({ icon: "info", title: "No current stop" });
+          try {
+            const res = await fetch(
+              `/api/driver/route/stop/${encodeURIComponent(stop.id)}/complete`,
+              {
+                method: "POST",
+                credentials: "include",
+              }
+            );
+            if (!res.ok) throw new Error("Failed");
+            Swal.fire({ icon: "success", title: "Marked complete" });
+            await loadRoute();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Recalculate route
+        $("#recalcBtn").on("click", async function () {
+          try {
+            const res = await fetch("/api/driver/route/recalculate", {
+              method: "POST",
+              credentials: "include",
+            });
+            const txt = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(txt) && safeParse(txt).message) || "Failed to recalc"
+              );
+            Swal.fire({ icon: "success", title: "Route recalculated" });
+            await loadRoute();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // Finish route
+        $("#finishRouteBtn").on("click", async function () {
+          const confirmed = await Swal.fire({
+            title: "Finish route and go offline?",
+            showCancelButton: true,
+            confirmButtonText: "Finish",
+          });
+          if (!confirmed.isConfirmed) return;
+          try {
+            const res = await fetch("/api/driver/route/finish", {
+              method: "POST",
+              credentials: "include",
+            });
+            if (!res.ok) throw new Error("Failed to finish route");
+            Swal.fire({ icon: "success", title: "Route finished" }).then(() => {
+              window.location.href = "dashboard.html";
+            });
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // initial load
+        $(function () {
+          loadRoute();
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>

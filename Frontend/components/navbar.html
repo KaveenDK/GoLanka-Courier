@@ -1,0 +1,71 @@
+<!-- components/navbar.html
+     Main navigation links. Intended to be included into header or sidebar.
+     Role-based items have data-role attributes: show/hide by checking current user roles.
+     Example usage:
+       $("#nav").load("/components/navbar.html");
+       // then show items by role:
+       $("[data-role='driver']").show();
+-->
+
+<nav
+  id="main-nav"
+  class="flex items-center gap-4"
+  aria-label="Primary navigation"
+>
+  <!-- Public links -->
+  <a href="/index.html" class="text-sm font-medium hover:underline">Home</a>
+  <a
+    href="/pages/parcel-tracking.html"
+    class="text-sm font-medium hover:underline"
+    >Track Parcel</a
+  >
+  <a href="/pages/pricing.html" class="text-sm font-medium hover:underline"
+    >Pricing</a
+  >
+  <a href="/pages/contact.html" class="text-sm font-medium hover:underline"
+    >Contact</a
+  >
+
+  <!-- Role-specific / authenticated links (hidden by default) -->
+  <a
+    href="/pages/dashboard-customer.html"
+    class="text-sm font-medium hover:underline hidden"
+    data-role="customer"
+    >My Parcels</a
+  >
+  <a
+    href="/pages/dashboard-driver.html"
+    class="text-sm font-medium hover:underline hidden"
+    data-role="driver"
+    >Driver App</a
+  >
+  <a
+    href="/pages/dashboard-staff.html"
+    class="text-sm font-medium hover:underline hidden"
+    data-role="staff"
+    >Staff Console</a
+  >
+  <a
+    href="/pages/dashboard-admin.html"
+    class="text-sm font-medium hover:underline hidden"
+    data-role="admin"
+    >Admin</a
+  >
+
+  <!-- CTA -->
+  <div class="ml-3">
+    <a href="/pages/create-parcel.html" class="btn btn-primary text-sm"
+      >Create Parcel</a
+    >
+  </div>
+</nav>
+
+<!-- Developer notes:
+   - main.js should run something like:
+       const roles = window.appUser?.roles || [];
+       document.querySelectorAll("[data-role]").forEach(el => {
+         const r = el.getAttribute("data-role");
+         el.classList.toggle("hidden", !roles.includes(r.toUpperCase()));
+       });
+   - Keep labels short (mobile).
+-->

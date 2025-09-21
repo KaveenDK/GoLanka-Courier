@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin — Users — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
+  >
+    <!-- header -->
+    <div id="header-placeholder" role="banner"></div>
+
+    <main class="max-w-7xl mx-auto p-6">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">User Management</h1>
+          <p class="text-sm text-slate-500">
+            Search, view and manage platform users (customers, drivers, staff).
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="inviteBtn" class="btn btn-primary">Invite User</button>
+          <button id="bulkDisableBtn" class="btn btn-ghost">
+            Disable Selected
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & filters -->
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+          <div>
+            <label class="text-xs text-slate-500">Search</label>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="email, name, phone"
+              class="input w-full"
+            />
+          </div>
+          <div>
+            <label for="roleFilter" class="text-xs text-slate-500">Role</label>
+            <select id="roleFilter" class="input w-full">
+              <option value="">Any</option>
+              <option value="ROLE_CUSTOMER">Customer</option>
+              <option value="ROLE_DRIVER">Driver</option>
+              <option value="ROLE_STAFF">Staff</option>
+              <option value="ROLE_ADMIN">Admin</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Status</label>
+            <select id="statusFilter" class="input w-full" title="Status">
+              <option value="">Any</option>
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+          <div>
+            <button id="searchBtn" class="btn btn-primary w-full">
+              Search
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users table -->
+      <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-4">
+        <div class="overflow-x-auto">
+          <table id="usersTable" class="min-w-full text-left">
+            <thead>
+              <tr class="text-xs text-slate-500 border-b">
+                <th class="py-2 px-3">
+                  <label for="selectAll" class="sr-only"
+                    >Select all users</label
+                  >
+                  <input
+                    id="selectAll"
+                    type="checkbox"
+                    title="Select all users"
+                  />
+                </th>
+                <th class="py-2 px-3">Email</th>
+                <th class="py-2 px-3">Name</th>
+                <th class="py-2 px-3">Phone</th>
+                <th class="py-2 px-3">Roles</th>
+                <th class="py-2 px-3">Enabled</th>
+                <th class="py-2 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody" class="divide-y">
+              <tr>
+                <td colspan="7" class="p-6 text-center text-sm text-slate-400">
+                  Use search to list users
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-4">
+          <div id="pagerInfo" class="text-sm text-slate-500">—</div>
+          <div class="flex items-center gap-2">
+            <button id="prevPage" class="btn btn-ghost btn-sm">Prev</button>
+            <button id="nextPage" class="btn btn-ghost btn-sm">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- footer -->
+    <div id="footer-placeholder" role="contentinfo"></div>
+
+    <!-- Core helpers -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/notifications.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/admin.js"></script>
+
+    <!-- Page script (inline) -->
+    <script>
+      (function ($, Swal) {
+        function safeParse(t) {
+          try {
+            return t ? JSON.parse(t) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        $("#header-placeholder").load("../../components/header.html");
+        $("#footer-placeholder").load("../../components/footer.html");
+
+        let page = 0,
+          size = 20,
+          total = 0;
+
+        async function fetchUsers() {
+          const q = $("#searchInput").val() || "";
+          const role = $("#roleFilter").val() || "";
+          const status = $("#statusFilter").val() || "";
+          $("#usersTbody").html(
+            '<tr><td colspan="7" class="p-6 text-center text-sm text-slate-400">Loading…</td></tr>'
+          );
+          try {
+            const params = new URLSearchParams({
+              q,
+              role,
+              status,
+              page: page,
+              size: size,
+            }).toString();
+            const res = await fetch("/api/admin/users?" + params, {
+              credentials: "include",
+            });
+            const text = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(text) && safeParse(text).message) ||
+                  "Failed to fetch users"
+              );
+            const json = safeParse(text) || { items: [], total: 0 };
+            total = json.total || (json.items ? json.items.length : 0);
+            renderUsers(json.items || []);
+            updatePager();
+          } catch (err) {
+            $("#usersTbody").html(
+              '<tr><td colspan="7" class="p-6 text-center text-sm text-red-500">Failed to load users</td></tr>'
+            );
+            console.error(err);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        }
+
+        function renderUsers(users) {
+          const $tb = $("#usersTbody").empty();
+          if (!users || !users.length) {
+            $tb.append(
+              '<tr><td colspan="7" class="p-6 text-center text-sm text-slate-400">No users found</td></tr>'
+            );
+            return;
+          }
+          users.forEach((u) => {
+            const roles = (u.roles || []).join(", ");
+            const enabled = u.enabled ? "Yes" : "No";
+            const row = $(`
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+              <td class="py-2 px-3"><input class="sel" data-id="${
+                u.id
+              }" type="checkbox" /></td>
+              <td class="py-2 px-3 text-sm font-mono">${u.email || ""}</td>
+              <td class="py-2 px-3">${u.fullName || ""}</td>
+              <td class="py-2 px-3">${u.phone || ""}</td>
+              <td class="py-2 px-3 text-sm">${roles}</td>
+              <td class="py-2 px-3">${enabled}</td>
+              <td class="py-2 px-3 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button class="btn btn-xs btn-ghost viewBtn" data-id="${
+                    u.id
+                  }">View</button>
+                  <button class="btn btn-xs btn-ghost roleBtn" data-id="${
+                    u.id
+                  }">Roles</button>
+                  <button class="btn btn-xs btn-danger disableBtn" data-id="${
+                    u.id
+                  }">${u.enabled ? "Disable" : "Enable"}</button>
+                </div>
+              </td>
+            </tr>
+          `);
+            row.find(".viewBtn").on("click", async function () {
+              const id = $(this).data("id");
+              try {
+                const res = await fetch(
+                  "/api/admin/users/" + encodeURIComponent(id),
+                  { credentials: "include" }
+                );
+                const txt = await res.text();
+                if (!res.ok)
+                  throw new Error(
+                    (safeParse(txt) && safeParse(txt).message) || "Failed"
+                  );
+                const json = safeParse(txt) || {};
+                Swal.fire({
+                  title: json.email || "User",
+                  html: `<div class="text-left">
+                        <div><strong>Name:</strong> ${json.fullName || ""}</div>
+                        <div><strong>Phone:</strong> ${json.phone || ""}</div>
+                        <div><strong>City:</strong> ${json.city || ""}</div>
+                        <div><strong>Roles:</strong> ${(json.roles || []).join(
+                          ", "
+                        )}</div>
+                      </div>`,
+                });
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            row.find(".roleBtn").on("click", async function () {
+              const id = $(this).data("id");
+              const { value: newRole } = await Swal.fire({
+                title: "Assign role",
+                input: "select",
+                inputOptions: {
+                  ROLE_CUSTOMER: "Customer",
+                  ROLE_DRIVER: "Driver",
+                  ROLE_STAFF: "Staff",
+                  ROLE_ADMIN: "Admin",
+                },
+                showCancelButton: true,
+              });
+              if (!newRole) return;
+              try {
+                const res = await fetch(
+                  "/api/admin/users/" + encodeURIComponent(id) + "/roles",
+                  {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ role: newRole }),
+                  }
+                );
+                if (!res.ok) throw new Error("Failed to assign role");
+                Swal.fire({ icon: "success", title: "Role assigned" });
+                fetchUsers();
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            row.find(".disableBtn").on("click", async function () {
+              const id = $(this).data("id");
+              const doDisable = $(this).text().trim() === "Disable";
+              const confirm = await Swal.fire({
+                title: `${doDisable ? "Disable" : "Enable"} user?`,
+                showCancelButton: true,
+                confirmButtonText: doDisable ? "Disable" : "Enable",
+              });
+              if (!confirm.isConfirmed) return;
+              try {
+                const res = await fetch(
+                  "/api/admin/users/" +
+                    encodeURIComponent(id) +
+                    "/" +
+                    (doDisable ? "disable" : "enable"),
+                  {
+                    method: "POST",
+                    credentials: "include",
+                  }
+                );
+                if (!res.ok) throw new Error("Failed");
+                Swal.fire({
+                  icon: "success",
+                  title: doDisable ? "Disabled" : "Enabled",
+                });
+                fetchUsers();
+              } catch (err) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: err.message || "",
+                });
+              }
+            });
+            $tb.append(row);
+          });
+        }
+
+        function updatePager() {
+          const start = page * size + 1;
+          const end = Math.min((page + 1) * size, total);
+          $("#pagerInfo").text(
+            total ? `Showing ${start} – ${end} of ${total}` : "No results"
+          );
+        }
+
+        $("#searchBtn").on("click", function () {
+          page = 0;
+          fetchUsers();
+        });
+        $("#nextPage").on("click", function () {
+          page++;
+          fetchUsers();
+        });
+        $("#prevPage").on("click", function () {
+          if (page > 0) page--;
+          fetchUsers();
+        });
+
+        $("#selectAll").on("change", function () {
+          $(".sel").prop("checked", this.checked);
+        });
+        $("#bulkDisableBtn").on("click", async function () {
+          const ids = $(".sel:checked")
+            .map(function () {
+              return $(this).data("id");
+            })
+            .get();
+          if (!ids.length)
+            return Swal.fire({ icon: "info", title: "No users selected" });
+          const confirm = await Swal.fire({
+            title: "Disable selected users?",
+            showCancelButton: true,
+            confirmButtonText: "Disable",
+          });
+          if (!confirm.isConfirmed) return;
+          try {
+            const res = await fetch("/api/admin/users/bulk-disable", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userIds: ids }),
+            });
+            if (!res.ok) throw new Error("Failed");
+            Swal.fire({ icon: "success", title: "Disabled" });
+            fetchUsers();
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        $("#inviteBtn").on("click", async function () {
+          const { value: email } = await Swal.fire({
+            title: "Invite user by email",
+            input: "email",
+            inputPlaceholder: "user@example.com",
+            showCancelButton: true,
+          });
+          if (!email) return;
+          try {
+            const res = await fetch("/api/admin/users/invite", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email }),
+            });
+            const text = await res.text();
+            if (!res.ok)
+              throw new Error(
+                (safeParse(text) && safeParse(text).message) || "Invite failed"
+              );
+            Swal.fire({ icon: "success", title: "Invitation sent" });
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: err.message || "",
+            });
+          }
+        });
+
+        // initial state (no auto search) — you can auto-list first page:
+        $(function () {
+          /* optionally call fetchUsers(); */
+        });
+      })(window.jQuery, window.Swal);
+    </script>
+  </body>
+</html>
