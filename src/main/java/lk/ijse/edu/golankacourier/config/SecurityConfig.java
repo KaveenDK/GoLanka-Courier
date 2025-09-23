@@ -2,11 +2,10 @@ package lk.ijse.edu.golankacourier.config;
 
 /**
  * --------------------------------------------
- *
  * @Author Dimantha Kaveen
  * @GitHub: https://github.com/KaveenDK
  * --------------------------------------------
- * @Created 9/21/2025
+ * @Created 8/30/2025
  * @Project GoLankaCourier
  * --------------------------------------------
  **/
@@ -39,9 +38,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Security configuration using the JwtFilter (constructed inside filterChain to avoid circular refs).
- */
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)

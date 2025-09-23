@@ -1,5 +1,15 @@
 package lk.ijse.edu.golankacourier;
 
+/**
+ * --------------------------------------------
+ * @Author Dimantha Kaveen
+ * @GitHub: https://github.com/KaveenDK
+ * --------------------------------------------
+ * @Created 8/30/2025
+ * @Project GoLankaCourier
+ * --------------------------------------------
+ **/
+
 import lk.ijse.edu.golankacourier.config.AppProperties;
 import lk.ijse.edu.golankacourier.entity.Role;
 import lk.ijse.edu.golankacourier.repository.RoleRepository;

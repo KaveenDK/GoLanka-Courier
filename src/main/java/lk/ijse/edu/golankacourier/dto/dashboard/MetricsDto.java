@@ -1,4 +1,4 @@
-package lk.ijse.edu.golankacourier.dto.auth;
+package lk.ijse.edu.golankacourier.dto.dashboard;
 
 /**
  * --------------------------------------------
@@ -10,17 +10,16 @@ package lk.ijse.edu.golankacourier.dto.auth;
  * --------------------------------------------
  **/
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-/**
- * Generic auth response (used for signup, verify, forgot-password replies).
- */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDto {
-    private boolean success;
-    private String message;
+@Builder
+public class MetricsDto {
+    private Integer active;
+    private Integer delivered;
+    private Integer pending;
+    private Double spent;
 }

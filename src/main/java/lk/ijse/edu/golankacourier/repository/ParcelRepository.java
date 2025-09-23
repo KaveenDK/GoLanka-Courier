@@ -2,11 +2,10 @@ package lk.ijse.edu.golankacourier.repository;
 
 /**
  * --------------------------------------------
- *
  * @Author Dimantha Kaveen
  * @GitHub: https://github.com/KaveenDK
  * --------------------------------------------
- * @Created 9/21/2025
+ * @Created 8/30/2025
  * @Project GoLankaCourier
  * --------------------------------------------
  **/
@@ -19,9 +18,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/**
- * Repository for Parcel entity.
- */
 @Repository
 public interface ParcelRepository extends JpaRepository<Parcel, Long> {
 

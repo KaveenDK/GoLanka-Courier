@@ -10,13 +10,9 @@ package lk.ijse.edu.golankacourier.service;
  * --------------------------------------------
  **/
 
-import lk.ijse.edu.golankacourier.dto.user.UserProfileDto;
+import lk.ijse.edu.golankacourier.dto.dashboard.DashboardDto;
 import lk.ijse.edu.golankacourier.entity.User;
 
-public interface UserService {
-    User findById(Long id);
-    User findByEmail(String email);
-    UserProfileDto getProfile(Long userId);
-    UserProfileDto updateProfile(Long userId, UserProfileDto dto);
-    void changePassword(Long userId, String oldPassword, String newPassword);
+public interface DashboardService {
+    DashboardDto getDashboardForUser(User user, int notificationLimit);
 }
