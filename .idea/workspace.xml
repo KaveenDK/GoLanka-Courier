@@ -5,25 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="679485e4-530c-449b-9133-10023b47a5d3" name="Changes" comment="Redesign customer dashboard with enhanced UI and responsive dark mode support">
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/4.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/acc-verification.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/admin-dashboard.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/customer-signup.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/driver-dashboard.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/driver-signup.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/index.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/reset-password.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/signin.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/staff-dashboard.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screenshots/track-parcel.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/DashboardController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/NotificationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/ParcelController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/dashboard/DashboardDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/dashboard/MetricsDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/dashboard/ProfileDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/notification/NotificationDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/dto/parcel/ParcelSummaryDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/entity/Notification.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/repository/NotificationRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/DashboardService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/NotificationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/DashboardServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/service/impl/NotificationServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/GoLankaCourierApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/GoLankaCourierApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/AppProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/config/AppProperties.java" afterDir="false" />
@@ -83,7 +79,7 @@
       <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/JwtUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/Mapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/Mapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/ValidationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/main/java/lk/ijse/edu/golankacourier/util/ValidationUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/js/customer.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/js/customer.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,12 +89,13 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin Class" />
         <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/Backend" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -144,7 +141,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.GoLankaCourierApplication.executor": "Run",
-    "git-widget-placeholder": "KaveeN",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/Softwares/IntelliJ IDEA/GoLankaCourier",
@@ -188,7 +185,8 @@
       <updated>1758437071692</updated>
       <workItem from="1758437073625" duration="138000" />
       <workItem from="1758437313326" duration="26033000" />
-      <workItem from="1758473669073" duration="1915000" />
+      <workItem from="1758473669073" duration="2021000" />
+      <workItem from="1758538200231" duration="4659000" />
     </task>
     <task id="LOCAL-00001" summary="Remove entire GoLankaCourier project files&#10;&#10;Deleted all project files, including source code, configurations, and build-related files, effectively removing the GoLankaCourier project from the repository. This includes Java classes, resources, Maven configurations, and IDE-specific settings.">
       <option name="closed" value="true" />

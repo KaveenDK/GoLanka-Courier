@@ -1,30 +1,3 @@
-/**
- * customer.js
- * Customer dashboard + create-shipment logic for GoLanka Courier frontend
- *
- * Requirements:
- *  - jQuery
- *  - SweetAlert2 (Swal)
- *  - GoLankaApi (script.js) with apiJson, getUser, isAuthenticated helpers
- *
- * Expected DOM elements / selectors (adjust to match your HTML):
- *  - Dashboard:
- *    - #customer-name
- *    - #customer-email
- *    - #parcel-list tbody
- *    - #parcel-pagination (optional)
- *  - Create shipment form: #create-parcel-form
- *    fields: name (recipientFullName), recipientEmail, recipientPhone,
- *            pickupAddress, deliveryAddress, weightKg, lengthCm, widthCm, heightCm,
- *            parcelType, valueLkr (declared value)
- *    - button[type=submit] inside the form
- *    - #quote-result .price, .eta, .currency
- *  - Quote form (optional separate): #quote-form
- *  - Parcel details modal container: #parcel-details-modal (fill content)
- *
- * Add / modify selectors if your markup differs.
- */
-
 (function ($, Api, Swal) {
 
   console.log('customer.js is loading...');
