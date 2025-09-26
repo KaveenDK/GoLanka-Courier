@@ -1,26 +1,7 @@
-/**
- * auth.js (fixed & updated)
- * Signin / Signup / Verify / Forgot / Reset flows using jQuery + SweetAlert2 + GoLankaApi (script.js)
- *
- * Robustness improvements over the original:
- *  - Accepts multiple form ID/name variants (camelCase and kebab-case)
- *  - Graceful fallback to fetch if GoLankaApi is not present
- *  - Cleaner error handling and validation display
- *  - Safe setSubmitting helper that restores button text
- *  - Prefill verify/reset forms from sessionStorage or query string
- *
- * Expected DOM (adjust if project differs):
- *  - signup form: id "signup-form" or "signupForm"
- *  - signin form: id "signin-form" or "signinForm"
- *  - verify form: id "verify-email-form" or "verifyEmailForm"
- *  - forgot form: id "forgot-password-form" or "forgotForm"
- *  - reset form: id "reset-password-form" or "resetPasswordForm"
- *
- * Add/change selectors as needed.
- */
-
 (function ($, Api, Swal) {
   'use strict';
+
+  console.log('Auth.js loaded');
 
   // --- Small compatibility guards ---
   if (typeof $ === 'undefined') {
@@ -214,9 +195,7 @@
       city: $form.find('[name="city"]').val() || '',
       province: $form.find('[name="province"]').val() || '',
       country: $form.find('[name="country"]').val() || '',
-      postalCode: $form.find('[name="postalCode"]').val() || '',
-      latitude: parseFloat($form.find('[name="latitude"]').val()) || null,
-      longitude: parseFloat($form.find('[name="longitude"]').val()) || null
+      postalCode: $form.find('[name="postalCode"]').val() || ''
     };
 
     // quick client-side validation

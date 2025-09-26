@@ -1,26 +1,3 @@
-/**
- * admin.js
- * Admin console scripts for GoLanka Courier frontend
- *
- * Assumptions:
- *  - jQuery is loaded
- *  - SweetAlert2 is loaded as `Swal`
- *  - Global API helper `GoLankaApi` is available with:
- *      - apiJson(path, { method, body, params }) -> Promise resolving parsed JSON or rejecting { status, body/message }
- *      - isAuthenticated() -> boolean
- *      - getUser() -> current user info
- *
- * Features:
- *  - Users management (list, search, create, edit, deactivate/reactivate)
- *  - Roles management (list roles, assign/unassign)
- *  - System summary (stats: users, parcels, revenue)
- *  - Drivers management quick actions
- *  - Export users CSV
- *  - Basic pagination, polling for dashboard stats
- *
- * Adjust endpoint paths and field names to match your backend.
- */
-
 (function ($, Api, Swal) {
 
     console.log('admin.js is loading...');

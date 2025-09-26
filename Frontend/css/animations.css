@@ -1,9 +1,3 @@
-/* animations.css
-   Small, reusable keyframes & animation helpers.
-   Designed to complement Tailwind utility classes.
-*/
-
-/* Respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --anim-duration: 1ms !important;
@@ -11,7 +5,6 @@
   }
 }
 
-/* Defaults */
 :root {
   --anim-duration: 350ms;
   --anim-ease: cubic-bezier(.16,1,.3,1);
@@ -19,7 +12,6 @@
   --anim-slow: 600ms;
 }
 
-/* Fade in/out */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -29,25 +21,21 @@
   to   { opacity: 0; transform: translateY(6px); }
 }
 
-/* Slide + scale subtle entrance (cards/modal) */
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(12px) scale(.995); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Pop / bounce for small interactive elements */
 @keyframes pop {
   0%   { transform: scale(.96); opacity: .0; }
   60%  { transform: scale(1.03); opacity: 1; }
   100% { transform: scale(1); }
 }
 
-/* Spinner for small loading states */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Utility animation classes (use along with Tailwind classes) */
 .animate-fade-in {
   animation: fade-in var(--anim-duration) var(--anim-ease) both;
 }
@@ -64,27 +52,22 @@
   animation: spin 1s linear infinite;
 }
 
-/* Stagger helpers to be used via inline style or utility classes */
 .anim-delay-1 { animation-delay: 50ms; }
 .anim-delay-2 { animation-delay: 100ms; }
 .anim-delay-3 { animation-delay: 150ms; }
 .anim-delay-4 { animation-delay: 200ms; }
 
-/* Small utilities */
 .fade-enter { opacity: 0; }
 .fade-enter.fade-enter-active { opacity: 1; transition: opacity var(--anim-duration) var(--anim-ease); }
 
-/* Modal backdrop animation */
 .modal-backdrop {
   animation: fade-in var(--anim-duration) var(--anim-ease) both;
 }
 
-/* Toast slide from top */
 .toast-slide-down {
   animation: slide-up var(--anim-fast) var(--anim-ease) both;
 }
 
-/* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in, .animate-slide-up, .animate-pop, .animate-fade-out, .animate-spin {
     animation: none !important;

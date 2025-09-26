@@ -1,27 +1,3 @@
-/**
- * staff.js
- * Staff console scripts for GoLanka Courier frontend
- *
- * Assumptions:
- *  - jQuery is loaded
- *  - SweetAlert2 is loaded as `Swal`
- *  - Global API helper `GoLankaApi` is available with:
- *      - apiJson(path, { method, body, params }) -> Promise resolving parsed JSON or rejecting { status, body/message }
- *      - getUser() -> parsed JWT subject / user info
- *      - isAuthenticated() -> boolean
- *
- * Features:
- *  - List & search parcels
- *  - View parcel details in modal
- *  - Change parcel status (Hold, In Transit, Delivered, Cancelled)
- *  - Assign parcel to driver
- *  - Bulk operations (export CSV, bulk status)
- *  - Polling for new parcels / updates
- *  - Simple UI helpers (toasts, loading)
- *
- * Adjust selectors, endpoint paths and payloads to match your backend.
- */
-
 (function ($, Api, Swal) {
 
     console.log('staff.js is loading...');

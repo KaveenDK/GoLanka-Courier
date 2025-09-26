@@ -1,35 +1,3 @@
-/**
- * driver.js
- * Driver dashboard actions for GoLanka Courier frontend
- *
- * Requirements:
- *  - jQuery
- *  - SweetAlert2 (Swal)
- *  - GoLankaApi (script.js) with apiJson, getUser, isAuthenticated helpers
- *
- * Expected DOM elements / selectors (adjust to match your HTML):
- *  - #driver-name, #driver-email
- *  - #availability-toggle (checkbox/button) to set availability
- *  - #assignments-table tbody
- *  - #assignment-details-modal
- *  - #driver-location-share (button to share current GPS coordinates)
- *  - Buttons inside table rows: .accept-assignment, .decline-assignment, .navigate-pickup, .navigate-destination, .mark-picked, .mark-delivered
- *
- * Endpoints assumed (adjust to your backend):
- *  - GET  /api/driver/assignments                  -> list assigned/pending assignments for this driver
- *  - POST /api/driver/assignments/{id}/accept
- *  - POST /api/driver/assignments/{id}/decline
- *  - POST /api/driver/assignments/{id}/pickup
- *  - POST /api/driver/assignments/{id}/deliver
- *  - GET  /api/driver/assignments/{id}             -> details
- *  - GET  /api/driver/me                            -> driver profile
- *  - POST /api/driver/availability                  -> { available: true/false }
- *
- * Notes:
- *  - This file focuses on UI interactions & calling API wrapper (GoLankaApi.apiJson).
- *  - Add or change selectors to match your HTML markup.
- */
-
 (function ($, Api, Swal) {
 
     console.log('driver.js is loading...');

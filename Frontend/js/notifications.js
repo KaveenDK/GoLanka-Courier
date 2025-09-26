@@ -1,29 +1,3 @@
-/**
- * notifications.js
- *
- * SweetAlert2 toast wrapper + polling hooks for GoLanka Courier frontend
- *
- * Requirements:
- *  - jQuery
- *  - SweetAlert2 as `Swal`
- *  - A global API helper `GoLankaApi` with:
- *      - apiJson(path, { method, body, params }) -> Promise resolving parsed JSON or rejecting { status, body/message }
- *      - isAuthenticated() -> boolean
- *
- * Features:
- *  - Polls /api/notifications for new notifications (polling interval configurable)
- *  - Shows unobtrusive SweetAlert2 toasts for incoming notifications
- *  - Renders notification dropdown list (caller must include #notif-dropdown and #notif-badge in DOM)
- *  - Mark single notification read, mark all read
- *  - Exposes a small public API on window.GoLankaNotifications
- *
- * Usage (example HTML snippets):
- *  - Badge: <span id="notif-badge" class="hidden badge">0</span>
- *  - Dropdown container: <div id="notif-dropdown" class="dropdown-menu"></div>
- *
- * Adapt endpoints (`/api/notifications`) to your backend.
- */
-
 (function ($, Api, Swal) {
 
     console.log('notifications.js is loading...');

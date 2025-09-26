@@ -227,29 +227,6 @@
                 </label>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label class="block">
-                  <span class="text-sm font-medium">Latitude</span>
-                  <input
-                    name="latitude"
-                    type="number"
-                    step="any"
-                    class="input mt-1"
-                    placeholder="6.927079"
-                  />
-                </label>
-                <label class="block">
-                  <span class="text-sm font-medium">Longitude</span>
-                  <input
-                    name="longitude"
-                    type="number"
-                    step="any"
-                    class="input mt-1"
-                    placeholder="79.861244"
-                  />
-                </label>
-              </div>
-
               <!-- Driver-only fields (hidden unless Driver selected) -->
               <div
                 id="driverFields"
@@ -437,21 +414,7 @@
             province: (fd.get("province") || "").trim() || null,
             country: (fd.get("country") || "").trim() || null,
             postalCode: (fd.get("postalCode") || "").trim() || null,
-            latitude: null,
-            longitude: null,
           };
-
-          // parse floats
-          const latRaw = (fd.get("latitude") || "").toString().trim();
-          const lonRaw = (fd.get("longitude") || "").toString().trim();
-          if (latRaw !== "") {
-            const n = Number(latRaw);
-            payload.latitude = Number.isFinite(n) ? n : null;
-          }
-          if (lonRaw !== "") {
-            const n = Number(lonRaw);
-            payload.longitude = Number.isFinite(n) ? n : null;
-          }
 
           // driver-specific
           if (accountType === "driver") {

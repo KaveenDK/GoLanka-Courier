@@ -1,5 +1,6 @@
-// main.js (fragment loading disabled — paste entire file)
 'use strict';
+
+console.log('main.js is loading...');
 
 (function (window, document) {
   const $ = window.jQuery || null;

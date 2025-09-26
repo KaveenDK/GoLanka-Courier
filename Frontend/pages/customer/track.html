@@ -18,6 +18,24 @@
     <!-- Local CSS -->
     <link rel="stylesheet" href="../../css/styles.css" />
     <link rel="stylesheet" href="../../css/animations.css" />
+
+    <style>
+      .spinner {
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: rgba(0, 0, 0, 0.6);
+        border-radius: 9999px;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body
     class="bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen"
@@ -28,16 +46,22 @@
       <section class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
         <h1 class="text-2xl font-bold mb-2">Track your parcel</h1>
         <p class="text-sm text-slate-500 mb-4">
-          Enter the tracking ID or reference number we gave you.
+          Enter the tracking ID or reference number we gave you (e.g.
+          <code>GL-3B22D89B</code>).
         </p>
 
-        <form id="trackForm" class="flex gap-3 mb-4" role="search">
+        <form
+          id="trackForm"
+          class="flex gap-3 mb-4"
+          role="search"
+          autocomplete="off"
+        >
           <input
             name="trackingCode"
             id="trackingCode"
             class="input flex-1"
             type="text"
-            placeholder="Enter tracking ID e.g. GLK-123456"
+            placeholder="Enter tracking ID e.g. GL-123456"
             aria-label="Tracking code"
             required
           />
@@ -46,7 +70,14 @@
           </button>
         </form>
 
-        <div id="result" class="space-y-4 hidden" aria-live="polite">
+        <div id="feedback" class="mb-4"></div>
+
+        <div
+          id="result"
+          class="space-y-4 hidden"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <!-- populated dynamically -->
         </div>
       </section>
@@ -62,103 +93,20 @@
     <script src="../../js/customer.js"></script>
 
     <script>
-      (function ($, Swal) {
+      (function ($, Api, Swal) {
+        if (!$) return console.error("jQuery required");
+        // Prefer GoLankaApi if present. If not present, Api will be undefined and we fallback to fetch beneath.
+        Api = Api || window.GoLankaApi;
+
         const $form = $("#trackForm");
         const $result = $("#result");
         const $input = $("#trackingCode");
+        const $feedback = $("#feedback");
+        const $btn = $("#trackBtn");
 
-        // If ?code= query param present, auto-fill and track
-        const params = new URLSearchParams(window.location.search);
-        const auto = params.get("code");
-        if (auto) {
-          $input.val(auto);
-          setTimeout(() => $form.trigger("submit"), 300);
-        }
-
-        function renderStatusCard(data) {
-          // expected shape: { trackingId, status, lastUpdated, parcel: {...}, history: [...] }
-          const trackingId = data.trackingId || data.id || "—";
-          const status = data.status || "Unknown";
-          const updated = data.lastUpdated || data.updatedAt || "";
-          const parcel = data.parcel || {};
-          const history = Array.isArray(data.history) ? data.history : [];
-
-          const card = $(`
-          <div class="border rounded p-4 bg-gray-50 dark:bg-slate-900">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <div class="text-sm text-slate-500">Tracking ID</div>
-                <div class="font-mono font-semibold text-lg">${escapeHtml(
-                  trackingId
-                )}</div>
-              </div>
-              <div class="text-right">
-                <div class="text-sm text-slate-500">Status</div>
-                <div class="font-semibold">${escapeHtml(status)}</div>
-                <div class="text-xs text-slate-400">${escapeHtml(updated)}</div>
-              </div>
-            </div>
-
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <div class="text-xs text-slate-500">Description</div>
-                <div class="text-sm">${escapeHtml(
-                  parcel.description || "-"
-                )}</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Weight</div>
-                <div class="text-sm">${escapeHtml(
-                  (parcel.weightKg || "-") + (parcel.weightKg ? " kg" : "")
-                )}</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Service</div>
-                <div class="text-sm">${escapeHtml(
-                  parcel.serviceType || "-"
-                )}</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-500">Payment</div>
-                <div class="text-sm">${escapeHtml(
-                  parcel.paymentMethod || "-"
-                )}</div>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <div class="text-sm font-semibold mb-2">History</div>
-              <div class="space-y-2">
-                ${
-                  history.length
-                    ? history
-                        .map(
-                          (h) => `
-                  <div class="p-2 bg-white dark:bg-slate-800 border rounded">
-                    <div class="text-xs text-slate-400">${escapeHtml(
-                      h.timestamp || h.time || ""
-                    )}</div>
-                    <div class="font-medium">${escapeHtml(
-                      h.status || h.title || ""
-                    )}</div>
-                    <div class="text-sm text-slate-500">${escapeHtml(
-                      h.location || h.notes || ""
-                    )}</div>
-                  </div>
-                `
-                        )
-                        .join("")
-                    : '<div class="text-sm text-slate-500">No history available</div>'
-                }
-              </div>
-            </div>
-          </div>
-        `);
-          return card;
-        }
-
+        // helper: escape HTML
         function escapeHtml(s) {
-          if (!s && s !== 0) return "";
+          if (s === null || s === undefined) return "";
           return String(s).replace(
             /[&<>"'`]/g,
             (m) =>
@@ -173,70 +121,266 @@
           );
         }
 
-        $form.on("submit", async function (e) {
-          e.preventDefault();
-          const code = $.trim($input.val());
-          if (!code) {
-            await Swal.fire({
-              icon: "warning",
-              title: "Please enter a tracking ID",
-            });
-            return;
+        function formatTimestamp(ts) {
+          if (!ts) return "";
+          try {
+            // Accept epoch ms / ISO strings
+            const d = new Date(ts);
+            if (isNaN(d.getTime())) return String(ts);
+            return d.toLocaleString();
+          } catch (e) {
+            return String(ts);
           }
-          $("#trackBtn").prop("disabled", true).text("Tracking...");
-          $result.addClass("hidden").empty();
+        }
+
+        function clearUI() {
+          $result.empty().addClass("hidden");
+          $feedback.empty();
+        }
+
+        function showInfo(text) {
+          $feedback.html(
+            `<div class="text-sm text-slate-600">${escapeHtml(text)}</div>`
+          );
+        }
+
+        function showError(text) {
+          $feedback.html(
+            `<div class="text-sm text-red-600">${escapeHtml(text)}</div>`
+          );
+        }
+
+        function renderParcelDto(p) {
+          // p expected to be ParcelDto from backend
+          const tracking = p.trackingCode || p.trackingNumber || p.id || "—";
+          const status = p.status || "Unknown";
+          const created = formatTimestamp(p.createdAt);
+          const updated = formatTimestamp(p.updatedAt);
+          const price =
+            p.price != null ? Number(p.price).toLocaleString() + " LKR" : "-";
+          const weight = p.weight != null ? `${p.weight} kg` : "-";
+          const dims = p.dimensions || "-";
+          const pickup = p.pickupAddress || "-";
+          const delivery = p.deliveryAddress || "-";
+
+          // statusHistory is expected as list of { status, changedById, changedByName, timestamp, note }
+          const history = Array.isArray(p.statusHistory) ? p.statusHistory : [];
+
+          const $card = $(`
+            <div class="border rounded p-4 bg-gray-50 dark:bg-slate-900">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <div class="text-sm text-slate-500">Tracking ID</div>
+                  <div class="font-mono font-semibold text-lg">${escapeHtml(
+                    tracking
+                  )}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm text-slate-500">Status</div>
+                  <div class="font-semibold">${escapeHtml(status)}</div>
+                  <div class="text-xs text-slate-400">${escapeHtml(
+                    updated || created
+                  )}</div>
+                </div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <div class="text-xs text-slate-500">Pickup</div>
+                  <div class="text-sm">${escapeHtml(pickup)}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-slate-500">Delivery</div>
+                  <div class="text-sm">${escapeHtml(delivery)}</div>
+                </div>
+
+                <div>
+                  <div class="text-xs text-slate-500">Weight</div>
+                  <div class="text-sm">${escapeHtml(weight)}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-slate-500">Dimensions</div>
+                  <div class="text-sm">${escapeHtml(dims)}</div>
+                </div>
+
+                <div>
+                  <div class="text-xs text-slate-500">Price</div>
+                  <div class="text-sm">${escapeHtml(price)}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-slate-500">Customer</div>
+                  <div class="text-sm">${escapeHtml(
+                    p.customerName || "-"
+                  )}</div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <div class="text-sm font-semibold mb-2">History</div>
+                <div class="space-y-2">
+                  ${
+                    history.length
+                      ? history
+                          .map(
+                            (h) => `
+                    <div class="p-2 bg-white dark:bg-slate-800 border rounded">
+                      <div class="text-xs text-slate-400">${escapeHtml(
+                        formatTimestamp(h.timestamp)
+                      )}</div>
+                      <div class="font-medium">${escapeHtml(h.status)}</div>
+                      <div class="text-sm text-slate-500">${escapeHtml(
+                        h.note || ""
+                      )}</div>
+                    </div>
+                  `
+                          )
+                          .join("")
+                      : `<div class="text-sm text-slate-500">No history available</div>`
+                  }
+                </div>
+              </div>
+            </div>
+          `);
+          return $card;
+        }
+
+        async function doTrack(code) {
+          clearUI();
+          showInfo("Looking up parcel...");
+          $btn
+            .prop("disabled", true)
+            .html('<span class="spinner mr-2"></span>Tracking...');
 
           try {
-            // Use GET or POST depending on backend. Example GET: /api/parcels/track?code=...
-            const res = await fetch(
-              `/api/parcels/track?code=${encodeURIComponent(code)}`,
-              {
-                method: "GET",
-                credentials: "include",
-              }
-            );
+            let json = null;
 
-            const text = await res.text();
-            if (!res.ok) {
-              // attempt parse json
-              let body = null;
-              try {
-                body = text ? JSON.parse(text) : null;
-              } catch (err) {
-                body = text;
+            if (Api && typeof Api.apiJson === "function") {
+              // use GoLankaApi wrapper (handles base URL, auth, refresh)
+              json = await Api.apiJson(
+                `/api/parcels/track?code=${encodeURIComponent(code)}`,
+                { method: "GET" }
+              );
+            } else {
+              // fallback to plain fetch (no auth headers)
+              const resp = await fetch(
+                `/api/parcels/track?code=${encodeURIComponent(code)}`,
+                { method: "GET", credentials: "include" }
+              );
+              const text = await resp.text();
+              if (!resp.ok) {
+                // try parse body
+                let body = null;
+                try {
+                  body = text ? JSON.parse(text) : null;
+                } catch (e) {
+                  body = text;
+                }
+                const msg =
+                  body && body.message
+                    ? body.message
+                    : `Request failed (${resp.status})`;
+                const err = new Error(msg);
+                err.status = resp.status;
+                err.body = body;
+                throw err;
               }
-              const message =
-                body && body.message
-                  ? body.message
-                  : `Not found (status ${res.status})`;
-              throw new Error(message);
+              json = text ? JSON.parse(text) : null;
             }
-
-            const json = text ? JSON.parse(text) : null;
 
             if (!json) {
-              throw new Error("Empty response from server");
+              showError("Empty response from server");
+              return;
             }
 
-            // Render result
-            const card = renderStatusCard(json);
-            $result.append(card).removeClass("hidden");
+            // render parcel dto
+            const $card = renderParcelDto(json);
+            $result.append($card).removeClass("hidden");
+            $feedback.empty();
           } catch (err) {
+            // Api.apiJson throws an Error object created by script.js.makeError with .status and .body
             console.error("Track error", err);
-            await Swal.fire({
-              icon: "error",
-              title: "Track failed",
-              text: err.message || "Request failed",
-            });
+            let message = "Unexpected error while fetching tracking info.";
+            if (err && err.status === 404) {
+              message = "Tracking code not found.";
+            } else if (err && err.status === 400) {
+              message =
+                (err.body && err.body.message) || err.message || "Bad request";
+            } else if (err && err.status === 0) {
+              message = "Network error. Is the backend running?";
+            } else if (err && err.message) {
+              message = err.message;
+            }
+            showError(message);
+            // also show friendly modal for major errors
+            if (Swal) {
+              Swal.fire({
+                icon: "error",
+                title: "Track failed",
+                text: message,
+              });
+            }
           } finally {
-            $("#trackBtn").prop("disabled", false).text("Track");
+            $btn.prop("disabled", false).text("Track");
+          }
+        }
+
+        // If ?code= query param present, auto-fill and track after short delay
+        $(function () {
+          const params = new URLSearchParams(window.location.search);
+          const auto = params.get("code");
+          if (auto) {
+            $input.val(auto.trim());
+            // auto submit after a short delay to allow scripts to initialize
+            setTimeout(() => $form.trigger("submit"), 200);
           }
         });
 
-        // load header/footer if using includes
-        $("#header-placeholder").load("../../components/header.html");
-        $("#footer-placeholder").load("../../components/footer.html");
-      })(window.jQuery, window.Swal);
+        $form.on("submit", async function (e) {
+          e.preventDefault();
+          const code = $.trim($input.val() || "");
+          if (!code) {
+            if (Swal) {
+              await Swal.fire({
+                icon: "warning",
+                title: "Please enter a tracking ID",
+              });
+            } else {
+              alert("Please enter a tracking ID");
+            }
+            return;
+          }
+          await doTrack(code);
+        });
+
+        // MANUAL include loader using fetch (replaces jQuery .load usage)
+        async function loadInclude(selector, url) {
+          try {
+            const resp = await fetch(url, { credentials: "same-origin" });
+            if (!resp.ok) throw new Error(`Failed to load (${resp.status})`);
+            const html = await resp.text();
+            $(selector).html(html);
+          } catch (err) {
+            console.warn("Include load failed:", url, err);
+            // optionally show a minimal fallback header/footer so page isn't blank
+            if (selector === "#header-placeholder") {
+              $(selector).html(
+                `<header class="bg-white dark:bg-gray-800 shadow-sm"><div class="max-w-7xl mx-auto px-4 py-4"><div class="flex items-center space-x-3"><img src="../../assets/images/logo.png" class="h-8 w-8" alt="logo"/><div><div class="font-semibold">GoLanka Courier</div><div class="text-xs text-gray-500">Fast parcel delivery</div></div></div></div></header>`
+              );
+            }
+            if (selector === "#footer-placeholder") {
+              $(selector).html(
+                `<footer class="bg-white dark:bg-gray-800 mt-12 border-t border-gray-200 dark:border-gray-700"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"><div class="text-center text-sm text-gray-500 dark:text-gray-400">© ${new Date().getFullYear()} GoLanka Courier</div></div></footer>`
+              );
+            }
+          }
+        }
+
+        // load header/footer on DOM ready
+        $(function () {
+          loadInclude("#header-placeholder", "../../components/header.html");
+          loadInclude("#footer-placeholder", "../../components/footer.html");
+        });
+      })(window.jQuery, window.GoLankaApi, window.Swal);
     </script>
   </body>
 </html>

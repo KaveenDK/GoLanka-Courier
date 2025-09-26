@@ -1,33 +1,21 @@
-/* styles.css
-   Project-level styles, tokens and small component helpers.
-   Intended to be used together with Tailwind (CDN or built).
-*/
-
-/* ---------- Color tokens (light / dark) ----------
-   Use .dark on <html> to toggle dark mode (Tailwind convention).
-*/
 :root {
-  /* branding */
   --brand-50:  #f0f9ff;
   --brand-100: #e6f5ff;
-  --brand-500: #0ea5a0; /* teal-ish */
+  --brand-500: #0ea5a0;
   --brand-600: #059669;
   --accent:     var(--brand-500);
 
-  /* surface / text */
   --bg:         #ffffff;
   --card-bg:    #ffffff;
   --muted:      #6b7280;
   --text:       #0f172a;
   --glass:      rgba(15, 23, 42, 0.04);
 
-  /* success / error */
   --success:    #16a34a;
   --danger:     #ef4444;
   --warning:    #f59e0b;
 }
 
-/* Dark mode overrides */
 :root.dark, .dark {
   --bg:         #0b1220;
   --card-bg:    #071025;
@@ -38,9 +26,6 @@
   --accent:     var(--brand-500);
 }
 
-/* ---------- Base layout ----------
-   These complement Tailwind's utilities for consistent spacing/widths.
-*/
 html, body {
   height: 100%;
   background: var(--bg);
@@ -50,7 +35,6 @@ html, body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* App container */
 .container {
   max-width: 1100px;
   margin-left: auto;
@@ -59,7 +43,6 @@ html, body {
   padding-right: 1rem;
 }
 
-/* Card */
 .card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -68,13 +51,11 @@ html, body {
   border: 1px solid rgba(15,23,42,0.04);
 }
 
-/* Dark card shadow softer */
 .dark .card {
   box-shadow: 0 6px 18px rgba(3,8,15,0.4);
   border: 1px solid rgba(255,255,255,0.04);
 }
 
-/* Buttons - small set to use when Tailwind default isn't enough */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -89,7 +70,6 @@ html, body {
 }
 .btn:active { transform: translateY(1px); }
 
-/* Primary */
 .btn-primary {
   background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 85%, black 10%));
   color: white;
@@ -100,14 +80,12 @@ html, body {
   cursor: not-allowed;
 }
 
-/* Outline */
 .btn-outline {
   background: transparent;
   border: 1px solid rgba(15,23,42,0.08);
   color: var(--text);
 }
 
-/* Inputs */
 .input {
   display: block;
   width: 100%;
@@ -123,15 +101,12 @@ html, body {
   border-color: var(--accent);
 }
 
-/* Form helper / validation text */
 .form-help { font-size: .875rem; color: var(--muted); }
 .form-error { color: var(--danger); font-weight: 600; font-size: .875rem; }
 
-/* Small utility */
 .kv { display: flex; gap: .5rem; align-items: center; }
 .hint { color: var(--muted); font-size: .875rem; }
 
-/* Navbar */
 .site-header {
   background: linear-gradient(0deg, transparent, transparent);
   border-bottom: 1px solid rgba(15,23,42,0.04);
@@ -140,7 +115,6 @@ html, body {
   border-bottom: 1px solid rgba(255,255,255,0.03);
 }
 
-/* Small badge */
 .badge {
   display: inline-block;
   padding: .25rem .5rem;
@@ -153,7 +127,6 @@ html, body {
   color: var(--accent);
 }
 
-/* Modal helpers (if you implement bespoke modals) */
 .modal {
   position: fixed;
   inset: 0;
@@ -170,7 +143,6 @@ html, body {
   backdrop-filter: blur(4px);
 }
 
-/* small accessible visually-hidden helper */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -183,14 +155,12 @@ html, body {
   border: 0;
 }
 
-/* Focus ring that's visible but not ugly */
 :focus {
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
   border-radius: 8px;
 }
 
-/* Tiny responsive helpers (complement Tailwind) */
 .stack-gap {
   display: grid;
   gap: 1rem;
@@ -199,7 +169,6 @@ html, body {
   .stack-gap-md { gap: 1.25rem; }
 }
 
-/* Notifications area (top-right toast) */
 .toasts {
   position: fixed;
   right: 1rem;
@@ -210,13 +179,11 @@ html, body {
   z-index: 80;
 }
 
-/* Small table clean-up to pair with Tailwind */
 .table-clean th, .table-clean td {
   padding: .6rem .75rem;
   border-bottom: 1px solid rgba(2,6,23,0.04);
 }
 
-/* Avatar utility */
 .avatar {
   width: 40px;
   height: 40px;
@@ -228,23 +195,16 @@ html, body {
   border: 1px solid rgba(15,23,42,0.04);
 }
 
-/* Footer small */
 .site-footer {
   border-top: 1px solid rgba(15,23,42,0.04);
   padding: 1.25rem 0;
   color: var(--muted);
 }
 
-/* ---------- Small helpers for integration with SweetAlert2 ----------
-   SweetAlert2 uses its own DOM, these classes help maintain visual parity.
-*/
 .swal2-popup { font-family: inherit; border-radius: 12px; }
 .swal2-title { color: var(--text); font-weight: 700; }
 .swal2-content { color: var(--muted); }
 
-/* ---------- Utility override: keep long code blocks readable ----------
-   Use sparingly as Tailwind should cover most.
-*/
 .code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
   font-size: .9rem;
@@ -254,4 +214,3 @@ html, body {
   overflow: auto;
 }
 
-/* ---------- End styles.css ---------- */

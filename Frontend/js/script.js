@@ -1,16 +1,7 @@
-/**
- * script.js (improved)
- * Core helpers: apiFetch wrapper, auth helpers, token refresh
- *
- * - Adds richer error reporting (includes response text/html for 4xx/5xx)
- * - Adds optional mock fallback for frontend testing when backend returns 500
- * - Keeps same public API as before
- */
-
 'use strict';
 
 const Api = (function () {
-  console.log('script.js (improved) loading...');
+  console.log('script.js loading...');
 
   // ---------- Config (override via window.* if you want) ----------
   const API_BASE = (typeof window.API_BASE === 'string' && window.API_BASE) || 'http://localhost:8080';
@@ -38,6 +29,15 @@ const Api = (function () {
     err.body = body || null;
     if (rawText) err.bodyRaw = rawText;
     return err;
+  }
+
+  // ensure path is normalized and base/url joined safely
+  function buildUrl(path) {
+    if (!path) return API_BASE;
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    // ensure single leading slash
+    const p = path.startsWith('/') ? path : '/' + path;
+    return API_BASE.replace(/\/+$/, '') + p;
   }
 
   // ---------- Storage ----------
@@ -121,7 +121,7 @@ const Api = (function () {
     if (refreshPromise) return refreshPromise;
     refreshPromise = (async () => {
       try {
-        const url = `${API_BASE}/api/auth/refresh`;
+        const url = buildUrl('/api/auth/refresh');
         const resp = await fetch(url, {
           method: 'POST',
           credentials: 'include',
@@ -150,7 +150,7 @@ const Api = (function () {
 
   // ---------- apiFetch wrapper (detailed error info) ----------
   async function apiFetch(path, opts = {}) {
-    const url = path.startsWith('http://') || path.startsWith('https://') ? path : `${API_BASE}${path}`;
+    const url = buildUrl(path);
     const options = Object.assign({ method: 'GET', credentials: 'include', headers: {} }, opts);
 
     if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
@@ -169,6 +169,11 @@ const Api = (function () {
       resp = await fetch(url, options);
     } catch (networkErr) {
       console.error('Network error while fetching', url, networkErr);
+      // If dev-mode mock is enabled, try returning a mock response for GETs
+      if (USE_MOCK_ON_500 && options.method === 'GET') {
+        const mock = mockResponseFor(path);
+        if (mock) return new Response(JSON.stringify(mock), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
       throw makeError(0, null, `Network error: ${networkErr.message || networkErr}`);
     }
 
@@ -184,7 +189,7 @@ const Api = (function () {
         console.warn('Token refresh failed', e);
         setAccessToken(null);
         setRefreshTokenLocal(null);
-        try { await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' }); } catch (ignore) {}
+        try { await fetch(buildUrl('/api/auth/logout'), { method: 'POST', credentials: 'include' }); } catch (ignore) {}
         throw makeError(401, null, 'Unauthenticated');
       }
     }
@@ -192,13 +197,21 @@ const Api = (function () {
     return resp;
   }
 
-  // ---------- parse as JSON and throw on non-ok but include raw body ---------- 
+  // ---------- parse as JSON and throw on non-ok but include raw body ----------
   async function apiJson(path, opts = {}) {
     const resp = await apiFetch(path, opts);
     const text = await resp.text().catch(() => '');
     const json = safeJsonParse(text);
 
     if (!resp.ok) {
+      // If server returned 5xx and mock fallback is enabled, return mock if available
+      if (resp.status >= 500 && USE_MOCK_ON_500) {
+        const mock = mockResponseFor(path);
+        if (mock) {
+          return mock;
+        }
+      }
+
       // attach raw HTML/text to error to help debug 500s
       const contentType = resp.headers.get('content-type') || '';
       let body = json;
@@ -217,7 +230,7 @@ const Api = (function () {
   async function login(email, password) {
     if (!email || !password) throw new Error('email and password required');
 
-    const url = `${API_BASE}/api/auth/login`;
+    const url = buildUrl('/api/auth/login');
     let resp;
     try {
       resp = await fetch(url, { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
@@ -247,7 +260,7 @@ const Api = (function () {
   async function logout(redirectTo) {
     const target = redirectTo || SIGNIN_PAGE;
     try {
-      await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json' } });
+      await fetch(buildUrl('/api/auth/logout'), { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json' } });
     } catch (e) {
       console.warn('Logout request failed (continuing)', e);
     } finally {
@@ -271,20 +284,25 @@ const Api = (function () {
   function mockResponseFor(path) {
     // Provide very small mock payloads. Enable only during frontend dev.
     if (!USE_MOCK_ON_500) return null;
-    if (path.startsWith('/api/dashboard/customer')) {
+    // normalize path prefix
+    const p = (path || '').toString();
+    if (p.startsWith('/')) {
+      // ok
+    }
+    if (p.indexOf('/api/dashboard/customer') !== -1 || p.indexOf('api/dashboard/customer') !== -1) {
       return {
         profile: { name: 'Demo User', email: 'demo@golanka.test', phone: '+94-77-xxxxxxx', address: 'Colombo, Sri Lanka' },
         metrics: { active: 2, delivered: 12, pending: 1, spent: 12345 },
         notifications: [{ title: 'Welcome to GoLanka', timestamp: Date.now() }]
       };
     }
-    if (path.startsWith('/api/parcels')) {
+    if (p.indexOf('/api/parcels') !== -1 || p.indexOf('api/parcels') !== -1) {
       return [
         { id: 'p1', trackingNumber: 'GL-0001', recipientName: 'Bob', status: 'IN_TRANSIT', createdAt: new Date().toISOString(), serviceType: 'standard' },
         { id: 'p2', trackingNumber: 'GL-0002', recipientName: 'Charlie', status: 'DELIVERED', createdAt: new Date().toISOString(), serviceType: 'express' }
       ];
     }
-    if (path.startsWith('/api/notifications')) {
+    if (p.indexOf('/api/notifications') !== -1 || p.indexOf('api/notifications') !== -1) {
       return [{ title: 'Demo notification', timestamp: Date.now(), message: 'This is a mock notification' }];
     }
     return null;

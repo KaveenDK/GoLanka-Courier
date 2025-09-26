@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Parcel Details — GoLanka Courier</title>
+    <link rel="icon" href="../../assets/images/logo.png" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: "#0ea5a4", 700: "#089e9b" },
+              accent: { DEFAULT: "#ffb020" },
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-out",
+              "slide-up": "slideUp 0.5s ease-out",
+              "pulse-soft": "pulseSoft 2s infinite",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(10px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              pulseSoft: {
+                "0%, 100%": { opacity: "1" },
+                "50%": { opacity: "0.8" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- PayHere SDK -->
+    <script src="https://www.payhere.lk/lib/payhere.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+    <link rel="stylesheet" href="../../css/animations.css" />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .input {
+        @apply w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 transition-all duration-300;
+      }
+
+      .btn {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-3 font-medium transition-all duration-300;
+      }
+
+      .btn-primary {
+        @apply bg-primary hover:bg-primary-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+      }
+
+      .btn-secondary {
+        @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200;
+      }
+
+      .btn-danger {
+        @apply bg-red-500 hover:bg-red-600 text-white;
+      }
+
+      .btn-success {
+        @apply bg-green-500 hover:bg-green-600 text-white;
+      }
+
+      .btn-warning {
+        @apply bg-yellow-500 hover:bg-yellow-600 text-white;
+      }
+
+      .btn-sm {
+        @apply px-3 py-2 text-sm;
+      }
+
+      .btn-xs {
+        @apply px-2 py-1 text-xs;
+      }
+
+      .card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700;
+      }
+
+      .card-header {
+        @apply px-6 py-4 border-b border-gray-100 dark:border-gray-700;
+      }
+
+      .card-title {
+        @apply text-lg font-semibold text-gray-800 dark:text-white;
+      }
+
+      .card-body {
+        @apply p-6;
+      }
+
+      .status-badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+      }
+
+      .status-pending {
+        @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+      }
+
+      .status-created {
+        @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+      }
+
+      .status-paid {
+        @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+      }
+
+      .status-picked-up {
+        @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+      }
+
+      .status-in-transit {
+        @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200;
+      }
+
+      .status-delivered {
+        @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+      }
+
+      .status-cancelled {
+        @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+      }
+
+      .theme-toggle {
+        @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-200 transition-all duration-300;
+      }
+
+      .theme-toggle:hover {
+        @apply bg-gray-300 dark:bg-gray-600;
+      }
+
+      .nav-link {
+        @apply text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200;
+      }
+
+      .timeline-item {
+        @apply relative pl-8 pb-8;
+      }
+
+      .timeline-item:before {
+        @apply absolute left-0 top-0 w-4 h-4 bg-gray-300 rounded-full border-2 border-white;
+        content: "";
+      }
+
+      .timeline-item:after {
+        @apply absolute left-2 top-4 w-px bg-gray-300;
+        content: "";
+        height: calc(100% - 1rem);
+      }
+
+      .timeline-item:last-child:after {
+        display: none;
+      }
+
+      .timeline-item.active:before {
+        @apply bg-primary;
+      }
+
+      .info-row {
+        @apply flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0;
+      }
+
+      .info-label {
+        @apply text-sm font-medium text-gray-500 dark:text-gray-400;
+      }
+
+      .info-value {
+        @apply text-sm text-gray-900 dark:text-white font-medium;
+      }
+
+      /* Payment method radio styling */
+      .payment-option {
+        @apply relative p-4 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200;
+      }
+
+      .payment-option:hover {
+        @apply border-primary bg-primary/5;
+      }
+
+      .payment-option.selected {
+        @apply border-primary bg-primary/10;
+      }
+
+      .payment-option input[type="radio"] {
+        @apply sr-only;
+      }
+
+      .payment-option .radio-circle {
+        @apply absolute top-4 right-4 w-5 h-5 border-2 border-gray-300 rounded-full;
+      }
+
+      .payment-option.selected .radio-circle {
+        @apply border-primary bg-primary;
+      }
+
+      .payment-option.selected .radio-circle:after {
+        @apply absolute top-0.5 left-0.5 w-2 h-2 bg-white rounded-full;
+        content: "";
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300"
+  >
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-3">
+            <img
+              src="../../assets/images/logo.png"
+              alt="GoLanka Courier"
+              class="h-10 w-10"
+            />
+            <div>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                GoLanka Courier
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Fast parcel delivery
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <button
+              id="theme-toggle"
+              class="theme-toggle"
+              aria-label="Toggle dark mode"
+            >
+              <svg
+                class="w-5 h-5 hidden dark:block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                ></path>
+              </svg>
+              <svg
+                class="w-5 h-5 block dark:hidden"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 2a1 1 0 011 1v1a1 1 0 01-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </button>
+
+            <nav class="hidden md:flex space-x-6">
+              <a href="/pages/customer/dashboard.html" class="nav-link"
+                >Dashboard</a
+              >
+              <a href="/pages/customer/profile.html" class="nav-link"
+                >Profile</a
+              >
+              <a
+                href="/pages/auth/signin.html"
+                id="top-signout"
+                class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                >Sign out</a
+              >
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Breadcrumb -->
+      <nav class="flex mb-8" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+          <li class="inline-flex items-center">
+            <a href="/pages/customer/dashboard.html" class="nav-link"
+              >Dashboard</a
+            >
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg
+                class="w-6 h-6 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              <span class="ml-1 md:ml-2 text-sm font-medium text-gray-500"
+                >Parcel Details</span
+              >
+            </div>
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="flex justify-center items-center py-12">
+        <div class="text-center">
+          <svg
+            class="animate-spin h-12 w-12 text-primary mx-auto mb-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="text-gray-600 dark:text-gray-400">
+            Loading parcel details...
+          </p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="hidden">
+        <div class="card">
+          <div class="card-body text-center">
+            <svg
+              class="w-16 h-16 text-red-500 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              Parcel Not Found
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+              The parcel you're looking for doesn't exist or you don't have
+              permission to view it.
+            </p>
+            <a href="/pages/customer/dashboard.html" class="btn btn-primary"
+              >Back to Dashboard</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div id="mainContent" class="hidden">
+        <!-- Header Section -->
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
+        >
+          <div>
+            <h1
+              class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
+            >
+              Tracking:
+              <span id="trackingNumber" class="text-primary font-mono">—</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">
+              <span id="parcelStatus" class="status-badge status-created"
+                >Loading...</span
+              >
+            </p>
+          </div>
+
+          <div class="flex items-center space-x-3 mt-4 md:mt-0">
+            <button id="shareBtn" class="btn btn-secondary">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                ></path>
+              </svg>
+              Share
+            </button>
+            <button id="printBtn" class="btn btn-secondary">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                ></path>
+              </svg>
+              Print
+            </button>
+            <button id="trackLiveBtn" class="btn btn-primary">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              Track Live
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Parcel Information -->
+            <div class="card animate-fade-in">
+              <div class="card-header">
+                <h2 class="card-title">Parcel Information</h2>
+              </div>
+              <div class="card-body">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Sender Details -->
+                  <div>
+                    <h3
+                      class="text-lg font-semibold mb-4 text-gray-900 dark:text-white"
+                    >
+                      Sender Details
+                    </h3>
+                    <div class="space-y-3">
+                      <div class="info-row">
+                        <span class="info-label">Name</span>
+                        <span id="senderName" class="info-value">—</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Phone</span>
+                        <span id="senderPhone" class="info-value">—</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Address</span>
+                        <span id="senderAddress" class="info-value">—</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Recipient Details -->
+                  <div>
+                    <h3
+                      class="text-lg font-semibold mb-4 text-gray-900 dark:text-white"
+                    >
+                      Recipient Details
+                    </h3>
+                    <div class="space-y-3">
+                      <div class="info-row">
+                        <span class="info-label">Name</span>
+                        <span id="recipientName" class="info-value">—</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Phone</span>
+                        <span id="recipientPhone" class="info-value">—</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="info-label">Address</span>
+                        <span id="recipientAddress" class="info-value">—</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Package Details -->
+                <div class="mt-8">
+                  <h3
+                    class="text-lg font-semibold mb-4 text-gray-900 dark:text-white"
+                  >
+                    Package Details
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="info-row">
+                      <span class="info-label">Weight</span>
+                      <span id="packageWeight" class="info-value">—</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Dimensions</span>
+                      <span id="packageDimensions" class="info-value">—</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Service Type</span>
+                      <span id="serviceType" class="info-value">—</span>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <div class="info-row">
+                      <span class="info-label">Contents</span>
+                      <span id="packageContents" class="info-value">—</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Special Instructions</span>
+                      <span id="specialInstructions" class="info-value">—</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tracking Timeline -->
+            <div class="card animate-fade-in">
+              <div class="card-header">
+                <h2 class="card-title">Tracking Timeline</h2>
+              </div>
+              <div class="card-body">
+                <div id="trackingTimeline" class="space-y-0">
+                  <!-- Timeline items will be populated by JavaScript -->
+                  <div class="timeline-item">
+                    <div class="text-sm text-gray-500">Loading timeline...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Payment & Pricing -->
+            <div class="card animate-fade-in" style="animation-delay: 0.1s">
+              <div class="card-header">
+                <h2 class="card-title">Payment & Pricing</h2>
+              </div>
+              <div class="card-body">
+                <div class="space-y-4">
+                  <div class="info-row">
+                    <span class="info-label">Total Amount</span>
+                    <span
+                      id="totalAmount"
+                      class="text-xl font-bold text-primary"
+                      >LKR —</span
+                    >
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Payment Status</span>
+                    <span id="paymentStatus" class="status-badge status-pending"
+                      >—</span
+                    >
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Payment Method</span>
+                    <span id="paymentMethod" class="info-value">—</span>
+                  </div>
+                </div>
+
+                <!-- Payment Actions -->
+                <div id="paymentActions" class="mt-6 space-y-3">
+                  <!-- Payment method selection for unpaid parcels -->
+                  <div id="paymentMethodSelection" class="hidden">
+                    <h4
+                      class="text-sm font-medium text-gray-900 dark:text-white mb-3"
+                    >
+                      Choose Payment Method
+                    </h4>
+                    <div class="space-y-3">
+                      <label class="payment-option" data-method="card">
+                        <input type="radio" name="paymentMethod" value="card" />
+                        <div class="radio-circle"></div>
+                        <div class="flex items-center">
+                          <svg
+                            class="w-6 h-6 text-primary mr-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                            ></path>
+                          </svg>
+                          <div>
+                            <div class="font-medium">Credit/Debit Card</div>
+                            <div class="text-xs text-gray-500">
+                              Pay securely via PayHere
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+
+                      <label class="payment-option" data-method="cod">
+                        <input type="radio" name="paymentMethod" value="cod" />
+                        <div class="radio-circle"></div>
+                        <div class="flex items-center">
+                          <svg
+                            class="w-6 h-6 text-green-500 mr-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                            ></path>
+                          </svg>
+                          <div>
+                            <div class="font-medium">Cash on Delivery</div>
+                            <div class="text-xs text-gray-500">
+                              Pay when delivered
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+
+                    <button
+                      id="confirmPaymentMethod"
+                      class="btn btn-primary w-full mt-4"
+                      disabled
+                    >
+                      Confirm Payment Method
+                    </button>
+                  </div>
+
+                  <!-- Direct payment button for card payments -->
+                  <button id="payNowBtn" class="btn btn-success w-full hidden">
+                    <svg
+                      class="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                      ></path>
+                    </svg>
+                    Pay Now (Card)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card animate-fade-in" style="animation-delay: 0.2s">
+              <div class="card-header">
+                <h2 class="card-title">Quick Actions</h2>
+              </div>
+              <div class="card-body">
+                <div class="space-y-3">
+                  <button id="cancelParcelBtn" class="btn btn-danger w-full">
+                    <svg
+                      class="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                    Cancel Parcel
+                  </button>
+                  <button id="reportIssueBtn" class="btn btn-warning w-full">
+                    <svg
+                      class="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      ></path>
+                    </svg>
+                    Report Issue
+                  </button>
+                  <button
+                    id="contactSupportBtn"
+                    class="btn btn-secondary w-full"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      ></path>
+                    </svg>
+                    Contact Support
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="card animate-fade-in" style="animation-delay: 0.3s">
+              <div class="card-header">
+                <h2 class="card-title">Additional Information</h2>
+              </div>
+              <div class="card-body">
+                <div class="space-y-3">
+                  <div class="info-row">
+                    <span class="info-label">Created</span>
+                    <span id="createdAt" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Updated</span>
+                    <span id="updatedAt" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Pickup Date</span>
+                    <span id="pickupDate" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Estimated Delivery</span>
+                    <span id="estimatedDelivery" class="info-value">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="bg-white dark:bg-gray-800 mt-12 border-t border-gray-200 dark:border-gray-700"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+          © <span id="year"></span> GoLanka Courier — Smart Parcel Delivery
+          Platform for Sri Lanka
+        </div>
+      </div>
+    </footer>
+
+    <!-- Set API base -->
+    <script>
+      window.API_BASE = window.API_BASE || "http://localhost:8080";
+    </script>
+
+    <!-- Scripts -->
+    <script src="../../js/script.js"></script>
+    <script src="../../js/auth.js"></script>
+
+    <script>
+      // Set current year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Theme toggle functionality
+      const themeToggle = document.getElementById("theme-toggle");
+      const htmlElement = document.documentElement;
+
+      const savedTheme =
+        localStorage.getItem("theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light");
+
+      if (savedTheme === "dark") {
+        htmlElement.classList.add("dark");
+      } else {
+        htmlElement.classList.remove("dark");
+      }
+
+      themeToggle.addEventListener("click", function () {
+        htmlElement.classList.toggle("dark");
+        const isDark = htmlElement.classList.contains("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
+    </script>
+
+    <script>
+      (function ($, Swal) {
+        "use strict";
+
+        // Get parcel ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const parcelId = urlParams.get("id");
+
+        if (!parcelId) {
+          showError("No parcel ID provided");
+          return;
+        }
+
+        // API helper (fallback if main API not available)
+        const Api = window.GoLankaApi || {
+          async apiJson(path, opts = {}) {
+            const url = (window.API_BASE || "") + path;
+            const options = {
+              method: "GET",
+              credentials: "include",
+              headers: {},
+              ...opts,
+            };
+
+            if (options.body && typeof options.body === "object") {
+              options.headers["Content-Type"] = "application/json";
+              options.body = JSON.stringify(options.body);
+            }
+
+            const resp = await fetch(url, options);
+            const text = await resp.text();
+
+            if (!resp.ok) {
+              const error = new Error(`Request failed (${resp.status})`);
+              error.status = resp.status;
+              try {
+                error.body = JSON.parse(text);
+              } catch (e) {
+                error.body = text;
+              }
+              throw error;
+            }
+
+            try {
+              return JSON.parse(text);
+            } catch (e) {
+              return text;
+            }
+          },
+        };
+
+        let parcelData = null;
+
+        // Show/hide states
+        function showLoading() {
+          $("#loadingState").show();
+          $("#errorState").hide();
+          $("#mainContent").hide();
+        }
+
+        function showError(message) {
+          $("#loadingState").hide();
+          $("#errorState")
+            .show()
+            .find("p")
+            .text(message || "An error occurred");
+          $("#mainContent").hide();
+        }
+
+        function showContent() {
+          $("#loadingState").hide();
+          $("#errorState").hide();
+          $("#mainContent").show();
+        }
+
+        // Format date helper
+        function formatDate(dateStr) {
+          if (!dateStr) return "—";
+          try {
+            return new Date(dateStr).toLocaleString();
+          } catch (e) {
+            return dateStr;
+          }
+        }
+
+        // Get status class for badges
+        function getStatusClass(status) {
+          if (!status) return "status-pending";
+          const s = status.toLowerCase();
+          if (s.includes("created")) return "status-created";
+          if (s.includes("paid")) return "status-paid";
+          if (s.includes("picked")) return "status-picked-up";
+          if (s.includes("transit")) return "status-in-transit";
+          if (s.includes("deliver")) return "status-delivered";
+          if (s.includes("cancel")) return "status-cancelled";
+          return "status-pending";
+        }
+
+        // Load parcel data
+        async function loadParcel() {
+          try {
+            showLoading();
+
+            const data = await Api.apiJson(
+              `/api/customers/parcels/${parcelId}`
+            );
+            parcelData = data;
+
+            populateParcelData(data);
+            showContent();
+          } catch (error) {
+            console.error("Failed to load parcel:", error);
+
+            if (error.status === 404) {
+              showError(
+                "Parcel not found or you don't have permission to view it."
+              );
+            } else if (error.status === 401) {
+              window.location.href = "/pages/auth/signin.html";
+            } else {
+              showError("Failed to load parcel details. Please try again.");
+            }
+          }
+        }
+
+        // Populate UI with parcel data
+        function populateParcelData(data) {
+          // Header
+          $("#trackingNumber").text(
+            data.trackingNumber || data.trackingId || "—"
+          );
+
+          const statusBadge = $("#parcelStatus");
+          statusBadge.text(data.status || "Unknown");
+          statusBadge.attr(
+            "class",
+            "status-badge " + getStatusClass(data.status)
+          );
+
+          // Sender details
+          $("#senderName").text(data.senderName || "—");
+          $("#senderPhone").text(data.senderPhone || "—");
+          $("#senderAddress").text(data.pickupAddress || "—");
+
+          // Recipient details
+          $("#recipientName").text(data.recipientName || "—");
+          $("#recipientPhone").text(data.recipientPhone || "—");
+          $("#recipientAddress").text(data.deliveryAddress || "—");
+
+          // Package details
+          $("#packageWeight").text(data.weight ? `${data.weight} kg` : "—");
+          $("#packageDimensions").text(data.dimensions || "—");
+          $("#serviceType").text(data.serviceType || "—");
+          $("#packageContents").text(data.contents || "—");
+          $("#specialInstructions").text(data.specialInstructions || "None");
+
+          // Payment details
+          $("#totalAmount").text(
+            data.totalPrice
+              ? `LKR ${parseFloat(data.totalPrice).toFixed(2)}`
+              : "LKR —"
+          );
+
+          const paymentStatusBadge = $("#paymentStatus");
+          paymentStatusBadge.text(data.paymentStatus || "Pending");
+          paymentStatusBadge.attr(
+            "class",
+            "status-badge " + getStatusClass(data.paymentStatus)
+          );
+
+          $("#paymentMethod").text(data.paymentMethod || "Not selected");
+
+          // Additional info
+          $("#createdAt").text(formatDate(data.createdAt));
+          $("#updatedAt").text(formatDate(data.updatedAt));
+          $("#pickupDate").text(
+            data.pickupDate
+              ? new Date(data.pickupDate).toLocaleDateString()
+              : "—"
+          );
+
+          // Calculate estimated delivery (pickup date + service days)
+          if (data.pickupDate && data.serviceType) {
+            const pickup = new Date(data.pickupDate);
+            let deliveryDays = 3; // default
+            if (data.serviceType.toLowerCase().includes("express"))
+              deliveryDays = 2;
+            if (data.serviceType.toLowerCase().includes("overnight"))
+              deliveryDays = 1;
+
+            pickup.setDate(pickup.getDate() + deliveryDays);
+            $("#estimatedDelivery").text(pickup.toLocaleDateString());
+          }
+
+          // Setup payment UI
+          setupPaymentUI(data);
+
+          // Setup timeline
+          setupTimeline(data);
+        }
+
+        // Setup payment UI based on status
+        function setupPaymentUI(data) {
+          const paymentActions = $("#paymentActions");
+          const paymentMethodSelection = $("#paymentMethodSelection");
+          const payNowBtn = $("#payNowBtn");
+
+          // Reset visibility
+          paymentMethodSelection.hide();
+          payNowBtn.hide();
+
+          if (data.paymentStatus === "PENDING" || !data.paymentStatus) {
+            // Show payment method selection for unpaid parcels
+            paymentMethodSelection.show();
+          } else if (data.paymentStatus === "PAID") {
+            // Show completed payment info
+            paymentActions.html(`
+              <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="text-green-700 dark:text-green-300 font-medium">Payment Completed</span>
+                </div>
+                <p class="text-green-600 dark:text-green-400 text-sm mt-1">Your parcel is ready for pickup!</p>
+              </div>
+            `);
+          } else if (data.paymentStatus === "CASH_ON_PICKUP") {
+            paymentActions.html(`
+              <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                  <span class="text-blue-700 dark:text-blue-300 font-medium">Cash on Delivery</span>
+                </div>
+                <p class="text-blue-600 dark:text-blue-400 text-sm mt-1">Pay ${
+                  data.totalPrice
+                    ? `LKR ${parseFloat(data.totalPrice).toFixed(2)}`
+                    : "the amount"
+                } when delivered.</p>
+              </div>
+            `);
+          }
+        }
+
+        // Setup tracking timeline
+        function setupTimeline(data) {
+          const timeline = $("#trackingTimeline");
+          timeline.empty();
+
+          // Default timeline based on status
+          const timelineItems = [
+            { status: "Created", date: data.createdAt, active: true },
+            {
+              status: "Payment Confirmed",
+              date: data.paymentStatus === "PAID" ? data.updatedAt : null,
+              active: data.paymentStatus === "PAID",
+            },
+            { status: "Ready for Pickup", date: null, active: false },
+            {
+              status: "Picked Up",
+              date: data.pickedUpAt,
+              active: !!data.pickedUpAt,
+            },
+            { status: "In Transit", date: null, active: false },
+            { status: "Out for Delivery", date: null, active: false },
+            {
+              status: "Delivered",
+              date: data.deliveredAt,
+              active: !!data.deliveredAt,
+            },
+          ];
+
+          timelineItems.forEach((item, index) => {
+            const isActive = item.active;
+            const timelineHtml = `
+              <div class="timeline-item ${isActive ? "active" : ""}">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="font-medium text-gray-900 dark:text-white">${
+                      item.status
+                    }</div>
+                    ${
+                      item.date
+                        ? `<div class="text-sm text-gray-500">${formatDate(
+                            item.date
+                          )}</div>`
+                        : ""
+                    }
+                  </div>
+                  ${
+                    isActive
+                      ? '<svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>'
+                      : ""
+                  }
+                </div>
+              </div>
+            `;
+            timeline.append(timelineHtml);
+          });
+        }
+
+        // Payment method selection handlers
+        $(document).on("click", ".payment-option", function () {
+          $(".payment-option").removeClass("selected");
+          $(this).addClass("selected");
+          $(this).find("input").prop("checked", true);
+          $("#confirmPaymentMethod").prop("disabled", false);
+        });
+
+        // Confirm payment method
+        $("#confirmPaymentMethod").on("click", async function () {
+          const selectedMethod = $("input[name='paymentMethod']:checked").val();
+
+          if (!selectedMethod) {
+            Swal.fire("Error", "Please select a payment method", "error");
+            return;
+          }
+
+          const $btn = $(this).prop("disabled", true).text("Processing...");
+
+          try {
+            if (selectedMethod === "cod") {
+              // Update to Cash on Delivery
+              await Api.apiJson(
+                `/api/customers/parcels/${parcelId}/payment-method`,
+                {
+                  method: "PUT",
+                  body: { paymentMethod: "CASH_ON_PICKUP" },
+                }
+              );
+
+              Swal.fire({
+                icon: "success",
+                title: "Payment Method Updated",
+                text: "Your parcel is set for Cash on Delivery",
+              }).then(() => {
+                location.reload();
+              });
+            } else if (selectedMethod === "card") {
+              // Initiate card payment
+              initiateCardPayment();
+            }
+          } catch (error) {
+            console.error("Failed to update payment method:", error);
+            Swal.fire("Error", "Failed to update payment method", "error");
+          } finally {
+            $btn.prop("disabled", false).text("Confirm Payment Method");
+          }
+        });
+
+        // PayHere integration
+        function initiateCardPayment() {
+          if (!parcelData) return;
+
+          const payment = {
+            sandbox: true,
+            merchant_id: "1221149", // Replace with actual merchant ID
+            return_url:
+              window.location.origin + "/pages/customer/payment-success.html",
+            cancel_url: window.location.href,
+            notify_url: window.location.origin + "/api/payments/payhere/notify",
+            order_id: parcelData.trackingNumber || `GOL-${Date.now()}`,
+            items: "Parcel Delivery Service",
+            amount: parseFloat(parcelData.totalPrice || 0).toFixed(2),
+            currency: "LKR",
+            hash: "",
+            first_name: parcelData.senderName
+              ? parcelData.senderName.split(" ")[0]
+              : "Customer",
+            last_name: parcelData.senderName
+              ? parcelData.senderName.split(" ").slice(1).join(" ")
+              : "",
+            email: "customer@example.com", // Get from user profile
+            phone: parcelData.senderPhone || "0771234567",
+            address: parcelData.pickupAddress || "Colombo",
+            city: "Colombo",
+            country: "Sri Lanka",
+          };
+
+          // Generate hash on backend
+          $.post("/api/payments/payhere/generate-hash", payment)
+            .done(function (response) {
+              payment.hash = response.hash;
+              payhere.startPayment(payment);
+            })
+            .fail(function () {
+              Swal.fire("Error", "Payment initialization failed", "error");
+            });
+        }
+
+        // PayHere callbacks
+        if (typeof payhere !== "undefined") {
+          payhere.onCompleted = function onCompleted(orderId) {
+            Swal.fire({
+              icon: "success",
+              title: "Payment Successful",
+              text: "Your payment has been processed successfully!",
+            }).then(() => {
+              location.reload();
+            });
+          };
+
+          payhere.onDismissed = function onDismissed() {
+            Swal.fire("Info", "Payment was cancelled", "info");
+          };
+
+          payhere.onError = function onError(error) {
+            Swal.fire("Error", "Payment failed: " + error, "error");
+          };
+        }
+
+        // Other action handlers
+        $("#cancelParcelBtn").on("click", function () {
+          Swal.fire({
+            title: "Cancel Parcel?",
+            text: "Are you sure you want to cancel this parcel? This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, cancel it!",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                await Api.apiJson(`/api/customers/parcels/${parcelId}/cancel`, {
+                  method: "PUT",
+                });
+
+                Swal.fire(
+                  "Cancelled!",
+                  "Your parcel has been cancelled.",
+                  "success"
+                ).then(() => location.reload());
+              } catch (error) {
+                Swal.fire("Error", "Failed to cancel parcel", "error");
+              }
+            }
+          });
+        });
+
+        $("#reportIssueBtn").on("click", function () {
+          Swal.fire({
+            title: "Report Issue",
+            input: "textarea",
+            inputLabel: "Describe the issue",
+            inputPlaceholder:
+              "Please describe the issue you're experiencing...",
+            showCancelButton: true,
+            confirmButtonText: "Submit Report",
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              Swal.fire(
+                "Reported!",
+                "Your issue has been reported to our support team.",
+                "success"
+              );
+            }
+          });
+        });
+
+        $("#contactSupportBtn").on("click", function () {
+          Swal.fire({
+            title: "Contact Support",
+            html: `
+              <div class="text-left">
+                <p class="mb-2"><strong>Phone:</strong> +94 11 234 5678</p>
+                <p class="mb-2"><strong>Email:</strong> support@golankacourier.lk</p>
+                <p class="mb-2"><strong>Live Chat:</strong> Available 24/7</p>
+                <p class="text-sm text-gray-500">Reference your tracking number: ${
+                  parcelData?.trackingNumber || "N/A"
+                }</p>
+              </div>
+            `,
+            icon: "info",
+          });
+        });
+
+        $("#shareBtn").on("click", function () {
+          const shareUrl = window.location.href;
+          if (navigator.share) {
+            navigator.share({
+              title: `GoLanka Courier - ${parcelData?.trackingNumber}`,
+              text: "Track this parcel on GoLanka Courier",
+              url: shareUrl,
+            });
+          } else {
+            navigator.clipboard.writeText(shareUrl).then(() => {
+              Swal.fire(
+                "Copied!",
+                "Tracking link copied to clipboard",
+                "success"
+              );
+            });
+          }
+        });
+
+        $("#printBtn").on("click", function () {
+          window.print();
+        });
+
+        $("#trackLiveBtn").on("click", function () {
+          window.open(
+            `/pages/customer/track.html?code=${parcelData?.trackingNumber}`,
+            "_blank"
+          );
+        });
+
+        // Initialize
+        $(document).ready(function () {
+          loadParcel();
+        });
+      })(jQuery, Swal);
+    </script>
+  </body>
+</html>

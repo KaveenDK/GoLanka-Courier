@@ -10,10 +10,8 @@
     <title>GoLanka Courier — Fast parcel delivery across Sri Lanka</title>
     <link rel="icon" href="/assets/images/logo.png" />
 
-    <!-- Tailwind CDN (no build step). We enable dark mode via 'class'. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Tailwind config for custom colors & dark mode via class
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -41,11 +39,9 @@
       };
     </script>
 
-    <!-- Project CSS (Tailwind utilities + small token file + animations) -->
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/animations.css" />
 
-    <!-- jQuery + SweetAlert2 (CDN) -->
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity=""
@@ -53,7 +49,6 @@
     ></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Small inline styles for accessibility focus rings & minor layout -->
     <style>
       :root {
         --container: 1200px;
@@ -80,22 +75,18 @@
       .avatar {
         @apply w-8 h-8 rounded-full object-cover;
       }
-      /* Theme toggle button styles */
       .theme-toggle {
         @apply p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-200 transition-all duration-300;
       }
       .theme-toggle:hover {
         @apply bg-gray-300 dark:bg-gray-600;
       }
-      /* Very small fallback for browsers that don't support tailwind directives in <style> */
     </style>
   </head>
   <body
     class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
   >
-    <!-- Header will be loaded here by jQuery -->
     <div id="site-header" role="banner">
-      <!-- Adding a custom header with theme toggle button -->
       <header
         class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 py-4"
       >
@@ -112,17 +103,17 @@
           <div class="flex items-center gap-4">
             <nav class="hidden md:flex items-center gap-6">
               <a
-                href="pages/create-parcel.html"
+                href="/pages/customer/new-shipment.html"
                 class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
                 >Create Parcel</a
               >
               <a
-                href="pages/parcel-tracking.html"
+                href="/pages/customer/track.html"
                 class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
                 >Track Parcel</a
               >
               <a
-                href="pages/pricing.html"
+                href="/pages/customer/dashboard.html"
                 class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
                 >Pricing</a
               >
@@ -133,7 +124,6 @@
               class="theme-toggle"
               aria-label="Toggle dark mode"
             >
-              <!-- Sun icon for light mode -->
               <svg
                 class="w-5 h-5 hidden dark:block"
                 fill="currentColor"
@@ -144,7 +134,6 @@
                   d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
                 ></path>
               </svg>
-              <!-- Moon icon for dark mode -->
               <svg
                 class="w-5 h-5 block dark:hidden"
                 fill="currentColor"
@@ -160,10 +149,10 @@
             </button>
 
             <div class="flex items-center gap-2 ml-2">
-              <a href="pages/auth/login.html" class="btn btn-outline text-sm"
+              <a href="/pages/auth/signin.html" class="btn btn-outline text-sm"
                 >Log in</a
               >
-              <a href="pages/auth/signup.html" class="btn btn-primary text-sm"
+              <a href="/pages/auth/signup.html" class="btn btn-primary text-sm"
                 >Sign up</a
               >
             </div>
@@ -172,9 +161,7 @@
       </header>
     </div>
 
-    <!-- Main content -->
     <main id="main" class="mt-6" role="main">
-      <!-- HERO -->
       <section
         class="hero bg-gradient-to-r from-white to-slate-50 dark:from-gray-900 dark:to-gray-800"
       >
@@ -193,13 +180,15 @@
             </p>
 
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="pages\auth\signup.html" class="btn btn-primary"
+              <a href="/pages/auth/signin.html" class="btn btn-primary"
                 >Get Started — Sign up</a
               >
-              <a href="pages/create-parcel.html" class="btn btn-outline"
+              <a
+                href="/pages/customer/new-shipment.html"
+                class="btn btn-outline"
                 >Create Parcel</a
               >
-              <a href="pages/parcel-tracking.html" class="btn btn-outline"
+              <a href="/pages/customer/track.html" class="btn btn-outline"
                 >Track Parcel</a
               >
             </div>
@@ -244,7 +233,6 @@
             </ul>
           </div>
 
-          <!-- Right column: quick tracking card + role cards -->
           <div>
             <div
               class="card p-5 shadow-sm bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
@@ -289,7 +277,7 @@
 
             <div class="grid grid-cols-2 gap-3 mt-4">
               <a
-                href="pages/dashboard-customer.html"
+                href="/pages/customer/dashboard.html"
                 class="card p-4 text-center hover:shadow-md"
               >
                 <div class="text-xl font-semibold">Customer</div>
@@ -298,21 +286,21 @@
                 </div>
               </a>
               <a
-                href="pages/dashboard-driver.html"
+                href="/pages/driver/dashboard.html"
                 class="card p-4 text-center hover:shadow-md"
               >
                 <div class="text-xl font-semibold">Driver</div>
                 <div class="text-sm text-muted mt-1">Pickups & deliveries</div>
               </a>
               <a
-                href="pages/dashboard-staff.html"
+                href="/pages/staff/dashboard.html"
                 class="card p-4 text-center hover:shadow-md"
               >
                 <div class="text-xl font-semibold">Staff</div>
                 <div class="text-sm text-muted mt-1">Operations dashboard</div>
               </a>
               <a
-                href="pages/dashboard-admin.html"
+                href="/pages/admin/dashboard.html"
                 class="card p-4 text-center hover:shadow-md"
               >
                 <div class="text-xl font-semibold">Admin</div>
@@ -325,7 +313,6 @@
         </div>
       </section>
 
-      <!-- FEATURES -->
       <section class="container py-12" aria-labelledby="features-heading">
         <h2 id="features-heading" class="text-2xl font-bold">
           Why choose GoLanka?
@@ -352,7 +339,6 @@
         </div>
       </section>
 
-      <!-- HOW IT WORKS -->
       <section class="bg-slate-50 dark:bg-gray-800 py-12">
         <div class="container">
           <h2 class="text-2xl font-bold">How it works</h2>
@@ -365,7 +351,6 @@
         </div>
       </section>
 
-      <!-- CTA -->
       <section class="container py-12 text-center">
         <div class="max-w-2xl mx-auto">
           <h3 class="text-xl font-semibold">Ready to ship?</h3>
@@ -373,16 +358,17 @@
             Sign up and start sending parcels across Sri Lanka today.
           </p>
           <div class="mt-4 flex justify-center gap-3">
-            <a href="pages\auth\signup.html" class="btn btn-primary"
+            <a href="/pages/auth/signup.html" class="btn btn-primary"
               >Create Account</a
             >
-            <a href="pages/pricing.html" class="btn btn-outline">See Pricing</a>
+            <a href="/pages/customer/dashboard.html" class="btn btn-outline"
+              >See Pricing</a
+            >
           </div>
         </div>
       </section>
     </main>
 
-    <!-- Footer -->
     <div id="site-footer" role="contentinfo" class="mt-12">
       <footer
         class="bg-gray-100 dark:bg-gray-800 py-8 border-t border-gray-200 dark:border-gray-700"
@@ -477,20 +463,15 @@
           <div
             class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-muted"
           >
-            © 2023 GoLanka Courier. All rights reserved.
+            © 2025 GoLanka Courier. All rights reserved.
           </div>
         </div>
       </footer>
     </div>
 
-    <!-- Recommended external script files (kept last for progressive enhancement) -->
     <script>
-      // Helper: page functionality - header/footer loading handled by main.js
       (function ($) {
         $(function () {
-          // Note: Header/footer loading removed to prevent conflicts with main.js
-
-          // Simple track form AJAX demo
           $("#track-form").on("submit", function (ev) {
             ev.preventDefault();
             const number = $("#trackingNumber").val()?.trim();
@@ -499,13 +480,10 @@
               return;
             }
 
-            // show spinner
             $("#track-result")
               .removeClass("hidden")
               .html('<div class="text-sm text-muted">Searching…</div>');
 
-            // Example AJAX: POST to your backend tracking endpoint
-            // Replace URL with your real API endpoint, and include auth headers if needed.
             $.ajax({
               url: "/api/track",
               method: "GET",
@@ -578,9 +556,9 @@
       })(jQuery);
     </script>
 
-    <!-- Hook to your project's JS files (if you have them). These should provide richer behavior (apiFetch, auth flows, token refresh, role guards, polling). -->
-    <script src="js/script.js" defer></script>
-    <script src="js/main.js" defer></script>
-    <script src="js/notifications.js" defer></script>
+    <script src="/js/auth.js" defer></script>
+    <script src="/js/main.js" defer></script>
+    <script src="/js/notifications.js" defer></script>
+    <script src="/js/script.js" defer></script>
   </body>
 </html>
