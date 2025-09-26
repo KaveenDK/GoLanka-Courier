@@ -20,15 +20,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * DTO for submitting a driver application.
- * Example usage: controller endpoint consumes multipart/form-data where document is an optional file.
- *
- * Note:
- *  - When this DTO is bound from multipart request in Spring MVC, make sure the controller method
- *    signature accepts @ModelAttribute DriverApplicationDto or maps individual parts.
- *  - Password fields are optional if you prefer sending activation link instead of immediate account creation.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -64,15 +55,8 @@ public class DriverApplicationDto {
     @Size(max = 2000)
     private String description;
 
-    /**
-     * Optional: driver can upload NIC scan or other documents.
-     * When using multipart/form-data, Spring will bind the uploaded file to this field.
-     */
     private MultipartFile document;
 
-    /**
-     * Optional: if you want to create an account immediately. Otherwise prefer activation link flow.
-     */
     @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
     private String password;
 

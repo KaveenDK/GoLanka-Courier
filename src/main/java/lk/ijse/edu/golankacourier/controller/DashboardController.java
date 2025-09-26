@@ -33,8 +33,18 @@ public class DashboardController {
             @AuthenticationPrincipal UserDetails ud,
             @RequestParam(name = "notifLimit", defaultValue = "5") int notifLimit) {
 
-        if (ud == null || ud.getUsername() == null) return ResponseEntity.status(401).build();
-        User user = userService.findByEmail(ud.getUsername());
+        if (ud == null || ud.getUsername() == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        User user;
+        try {
+            user = userService.findByEmail(ud.getUsername());
+            if (user == null) return ResponseEntity.status(401).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
+        }
+
         DashboardDto dto = dashboardService.getDashboardForUser(user, notifLimit);
         return ResponseEntity.ok(dto);
     }

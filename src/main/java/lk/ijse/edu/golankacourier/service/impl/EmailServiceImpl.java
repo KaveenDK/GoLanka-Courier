@@ -17,9 +17,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-/**
- * Minimal email service using JavaMailSender. For production, replace with templated emails (Thymeleaf).
- */
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {

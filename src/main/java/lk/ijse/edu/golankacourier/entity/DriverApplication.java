@@ -52,15 +52,9 @@ public class DriverApplication {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    /**
-     * Optional: path to uploaded NIC or driver docs stored on server or cloud
-     */
     @Column(name = "document_path", length = 500)
     private String documentPath;
 
-    /**
-     * PENDING / APPROVED / DECLINED
-     */
     @Column(length = 50)
     private String status = "PENDING";
 

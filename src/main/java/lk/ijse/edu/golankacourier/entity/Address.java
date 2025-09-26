@@ -17,9 +17,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Reusable embeddable address. Stored inline in user or other entities.
- */
 @Embeddable
 @Data
 @NoArgsConstructor
@@ -42,9 +39,4 @@ public class Address {
     @Column(length = 100)
     private String country;
 
-    @Column(name = "latitude")
-    private Double latitude;
-
-    @Column(name = "longitude")
-    private Double longitude;
 }

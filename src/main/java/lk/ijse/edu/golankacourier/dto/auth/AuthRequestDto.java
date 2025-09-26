@@ -17,9 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Login request payload.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

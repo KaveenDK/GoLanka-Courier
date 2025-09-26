@@ -27,9 +27,6 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    /**
-     * GET /api/users/me
-     */
     @GetMapping("/me")
     public ResponseEntity<ProfileDto> me() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

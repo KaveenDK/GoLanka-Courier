@@ -23,9 +23,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 
-/**
- * Repository for RefreshToken entity.
- */
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 

@@ -17,9 +17,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository for DriverApplication entity.
- */
 @Repository
 public interface DriverApplicationRepository extends JpaRepository<DriverApplication, Long> {
 

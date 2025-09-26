@@ -18,20 +18,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * JwtProvider is a thin wrapper used by services (AuthService) to generate and validate tokens.
- * It delegates to JwtUtil. This keeps a semantic boundary in services (generateAccessToken(User)).
- */
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
 
     private final JwtUtil jwtUtil;
 
-    /**
-     * Generate access token for a user entity.
-     * Exposes a simple method used by AuthService.
-     */
     public String generateAccessToken(User user) {
         List<String> roles = user.getRoles().stream()
                 .map(r -> r.getName())

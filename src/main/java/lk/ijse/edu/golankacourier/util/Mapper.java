@@ -17,12 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Thin wrapper over ModelMapper to centralize mapping configuration.
- *
- * Use: mapper.map(src, DestClass.class)
- * Use: mapper.mapList(list, DestClass.class)
- */
 @Component
 public class Mapper {
 

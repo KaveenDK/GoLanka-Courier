@@ -32,9 +32,6 @@ public class PaymentTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Merchant reference you set (e.g. parcel tracking or internal id)
-     */
     @Column(name = "merchant_ref", length = 200)
     private String merchantRef;
 
@@ -58,9 +55,6 @@ public class PaymentTransaction {
     @Column(name = "provider_txn_id", length = 200)
     private String providerTxnId;
 
-    /**
-     * PENDING / PAID / FAILED / CANCELLED
-     */
     @Column(length = 50)
     private String status;
 

@@ -25,9 +25,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Example values: ROLE_CUSTOMER, ROLE_DRIVER, ROLE_STAFF, ROLE_ADMIN
-     */
     @Column(nullable = false, length = 50)
     private String name;
 }

@@ -44,10 +44,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/assets/**")
                 .addResourceLocations("classpath:/static/assets/");
-
-        // swagger UI (if using springdoc)
-        registry.addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/4.15.5/");
     }
 }
 

@@ -38,10 +38,6 @@ public class PaymentController {
         return ResponseEntity.ok(payload);
     }
 
-    /**
-     * Webhook endpoint for PayHere (public, verify payload inside service).
-     * Configure this URL in PayHere sandbox/production dashboard.
-     */
     @PostMapping("/webhook/payhere")
     public ResponseEntity<String> payhereWebhook(@RequestBody Map<String, Object> payload) {
         paymentService.handleProviderWebhook(payload);

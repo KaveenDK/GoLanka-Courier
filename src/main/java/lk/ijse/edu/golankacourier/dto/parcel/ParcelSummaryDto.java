@@ -25,7 +25,6 @@ public class ParcelSummaryDto {
 
     private Long id;
 
-    // frontend expects `trackingNumber` sometimes - map trackingCode to trackingNumber
     @JsonProperty("trackingNumber")
     private String trackingNumber;
 
@@ -42,7 +41,7 @@ public class ParcelSummaryDto {
                 .recipientName(p.getCustomer() != null ? p.getCustomer().getFullName() : null)
                 .status(p.getStatus())
                 .createdAt(p.getCreatedAt())
-                .serviceType(null) // if you have service type field, map it here
+                .serviceType(null)
                 .weightKg(p.getWeight() != null ? p.getWeight().doubleValue() : null)
                 .build();
     }

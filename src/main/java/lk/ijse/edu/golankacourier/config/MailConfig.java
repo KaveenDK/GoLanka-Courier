@@ -19,9 +19,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
-/**
- * Configure JavaMailSender using spring.mail.* properties or app.mail.* fallbacks.
- */
 @Configuration
 @RequiredArgsConstructor
 public class MailConfig {

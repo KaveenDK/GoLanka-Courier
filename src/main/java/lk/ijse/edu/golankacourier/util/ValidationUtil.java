@@ -12,10 +12,6 @@ package lk.ijse.edu.golankacourier.util;
 
 import java.util.regex.Pattern;
 
-/**
- * Small validation helpers (NIC, phone, password strength).
- * Keep regexes conservative; adapt if you need special cases.
- */
 public final class ValidationUtil {
 
     private ValidationUtil() { /* no-op */ }
@@ -47,9 +43,6 @@ public final class ValidationUtil {
         return STRONG_PASSWORD.matcher(password).matches();
     }
 
-    /**
-     * Utility to normalize phone (remove spaces/dashes). This does not validate.
-     */
     public static String normalizePhone(String phone) {
         if (phone == null) return null;
         return phone.replaceAll("[\\s\\-]", "");

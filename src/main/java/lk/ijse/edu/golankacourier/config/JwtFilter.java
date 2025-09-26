@@ -27,12 +27,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * JwtFilter: validates incoming bearer token and sets Authentication in SecurityContext.
- *
- * NOTE: This class is intentionally NOT annotated with @Component to avoid circular injection
- * when SecurityConfig needs to register the filter. SecurityConfig creates an instance.
- */
 public class JwtFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtFilter.class);

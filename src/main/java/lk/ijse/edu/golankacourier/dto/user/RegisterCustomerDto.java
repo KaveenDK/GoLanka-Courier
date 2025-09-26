@@ -18,10 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for customer registration.
- * Note: server-side should validate that password and confirmPassword match.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,7 +34,6 @@ public class RegisterCustomerDto {
 
     @NotBlank(message = "Phone number is required")
     @Size(max = 50)
-    // simple phone pattern allowing digits, spaces, + and - . Adjust as needed for Sri Lanka numbers.
     @Pattern(regexp = "^[0-9+\\-\\s]{6,50}$", message = "Invalid phone number")
     private String phone;
 

@@ -24,18 +24,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Application entry point for GoLanka Courier backend.
- *
- * Responsibilities provided here:
- * - Bootstraps Spring Boot application.
- * - Enables scheduling (for cleanup jobs).
- * - Enables binding of AppProperties (app.*).
- * - Enables JPA auditing (created/updated timestamps if you annotate entities).
- * - Seeds default roles (ROLE_CUSTOMER, ROLE_DRIVER, ROLE_STAFF, ROLE_ADMIN) on startup if they do not exist.
- *
- * Adjust or remove role-seeding if you prefer Flyway-managed seeding.
- */
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties(AppProperties.class)
@@ -46,10 +34,6 @@ public class GoLankaCourierApplication {
         SpringApplication.run(GoLankaCourierApplication.class, args);
     }
 
-    /**
-     * Seeds initial roles into the database on startup.
-     * This is safe to keep in development; for production you may prefer to use Flyway SQL migrations.
-     */
     @Bean
     public CommandLineRunner seedRoles(RoleRepository roleRepository) {
         return args -> {

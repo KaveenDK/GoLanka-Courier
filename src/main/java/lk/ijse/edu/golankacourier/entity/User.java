@@ -48,11 +48,9 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = false;
 
-    // embedded address
     @Embedded
     private Address address;
 
-    // roles
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_roles_user")),

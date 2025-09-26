@@ -38,10 +38,6 @@ public class CustomerController {
     private final UserService userService;
     private final ParcelRepository parcelRepository;
 
-    /**
-     * Create a parcel for the authenticated customer
-     * POST /api/customers/parcels
-     */
     @PostMapping("/parcels")
     @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<ParcelDto> createParcel(@AuthenticationPrincipal UserDetails ud,
@@ -55,14 +51,6 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(parcelService.toDto(p));
     }
 
-    /**
-     * Get a parcel (customer-scoped path).
-     * GET /api/customers/parcels/{id}
-     * Allowed for:
-     *  - parcel owner (customer)
-     *  - assigned driver
-     *  - admin / staff
-     */
     @GetMapping("/parcels/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ParcelDto> getParcel(@AuthenticationPrincipal UserDetails ud,
@@ -86,10 +74,6 @@ public class CustomerController {
         return ResponseEntity.ok(parcelService.toDto(p));
     }
 
-    /**
-     * List customer parcels (paged).
-     * GET /api/customers/parcels
-     */
     @GetMapping("/parcels")
     @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<Page<ParcelDto>> listCustomerParcels(@AuthenticationPrincipal UserDetails ud, Pageable pageable) {
@@ -102,8 +86,5 @@ public class CustomerController {
         Page<ParcelDto> dtoPage = page.map(parcelService::toDto);
         return ResponseEntity.ok(dtoPage);
     }
-
-    // NOTE: Public tracking endpoint moved out of this controller to avoid conflicts.
-    // Place public tracking in ParcelController as: GET /api/parcels/track/{trackingCode}
 
 }

@@ -73,15 +73,11 @@ public class PaymentServiceImpl implements PaymentService {
         payload.put("merchant_reference", parcel.getTrackingCode());
         payload.put("amount", tx.getAmount().toPlainString());
         payload.put("currency", tx.getCurrency());
-        // add customer fields
         payload.put("first_name", dto.getCustomerName());
         payload.put("email", dto.getCustomerEmail());
         payload.put("phone", dto.getCustomerPhone());
-        // TODO: add return_url and notify_url from config
         payload.put("return_url", dto.getReturnUrl() != null ? dto.getReturnUrl() : "/payments/return");
         payload.put("notify_url", "/api/v1/webhook/payhere");
-
-        // TODO: compute and add PayHere signature/MD5 according to their docs
 
         Map<String, Object> result = new HashMap<>();
         result.put("paymentInitPayload", payload);
@@ -92,13 +88,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void handleProviderWebhook(Map<String, Object> payload) {
-        // Example payload handling:
-        // 1) verify signature using payhere secret (TODO)
-        // 2) locate PaymentTransaction by merchant_reference or provider_txn_id
-        // 3) update tx.status to PAID/FAILED and set providerTxnId, paidAt, rawPayload
-        // 4) mark parcel status appropriately and send receipt email
-
-        // NOTE: implementation depends on exact provider payload fields.
         String merchantRef = payload.getOrDefault("merchant_reference", payload.get("merchant_ref")) != null ?
                 payload.getOrDefault("merchant_reference", payload.get("merchant_ref")).toString() : null;
         String status = payload.getOrDefault("status", "UNKNOWN").toString();
@@ -109,12 +98,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         Optional<PaymentTransaction> maybe = paymentRepository.findByMerchantRef(merchantRef);
         if (maybe.isEmpty()) {
-            // log and ignore unknown payment
             return;
         }
         PaymentTransaction tx = maybe.get();
 
-        // example mapping
         if ("paid".equalsIgnoreCase(status) || "SUCCESS".equalsIgnoreCase(status)) {
             tx.setStatus("PAID");
         } else {
@@ -124,7 +111,6 @@ public class PaymentServiceImpl implements PaymentService {
         tx.setRawPayload(payload.toString());
         paymentRepository.save(tx);
 
-        // update parcel if paid
         Parcel parcel = tx.getParcel();
         if ("PAID".equalsIgnoreCase(tx.getStatus())) {
             parcel.setStatus("PAID");

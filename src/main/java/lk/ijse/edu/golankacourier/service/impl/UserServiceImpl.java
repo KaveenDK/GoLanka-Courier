@@ -52,9 +52,7 @@ public class UserServiceImpl implements UserService {
         User u = findById(userId);
         u.setFullName(dto.getFullName());
         u.setPhone(dto.getPhone());
-        // If you are using embedded Address, map dto.address to Address
         u.setEmail(dto.getEmail().toLowerCase(Locale.ROOT));
-        // optional: profile image url
         userRepository.save(u);
         return mapToProfileDto(u);
     }
@@ -68,7 +66,6 @@ public class UserServiceImpl implements UserService {
         }
         u.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(u);
-        // Optionally revoke refresh tokens for this user (via TokenService)
     }
 
     private UserProfileDto mapToProfileDto(User u) {
@@ -80,7 +77,7 @@ public class UserServiceImpl implements UserService {
         if (u.getAddress() != null) {
             dto.setAddress(u.getAddress().getLine());
         }
-        dto.setProfileImageUrl(null); // optional
+        dto.setProfileImageUrl(null);
         return dto;
     }
 }

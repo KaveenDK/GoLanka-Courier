@@ -29,19 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * Robust JWT helper using jjwt (HS256).
- *
- * Sources for secret (priority):
- * 1. app.jwt.secret
- * 2. jwt.secret
- * 3. env var JWT_SECRET
- *
- * If provided secret is base64 it will be decoded. If the resulting key is smaller than required
- * for HS256, we derive a 32-byte key using SHA-256(secret).
- *
- * Note: For production prefer RS256 with a key pair.
- */
 @Component
 public class JwtUtil {
 
@@ -118,13 +105,6 @@ public class JwtUtil {
         return null;
     }
 
-    /**
-     * Generate a JWT containing username and roles.
-     *
-     * @param username principal (sub)
-     * @param roles list of role names
-     * @return signed JWT string
-     */
     public String generateToken(String username, List<String> roles) {
         long now = System.currentTimeMillis();
         Date issuedAt = new Date(now);
@@ -140,12 +120,6 @@ public class JwtUtil {
         return b.compact();
     }
 
-    /**
-     * Validate token signature & expiration.
-     *
-     * @param token JWT string
-     * @return true if valid (signature ok and not expired)
-     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -193,9 +167,6 @@ public class JwtUtil {
         return getClaim(token, Claims::getExpiration);
     }
 
-    /**
-     * Build a simple map of token metadata (subject, issuedAt, expiration)
-     */
     public Map<String, Object> tokenMetadata(String token) {
         Claims c = getAllClaims(token);
         return Map.of(

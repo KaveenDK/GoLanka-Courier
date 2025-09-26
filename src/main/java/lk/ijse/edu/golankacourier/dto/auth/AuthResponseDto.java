@@ -14,9 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Generic auth response (used for signup, verify, forgot-password replies).
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

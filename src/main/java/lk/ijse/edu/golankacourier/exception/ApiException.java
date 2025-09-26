@@ -13,9 +13,6 @@ package lk.ijse.edu.golankacourier.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-/**
- * Simple runtime exception that carries an HTTP status and an optional code.
- */
 @Getter
 public class ApiException extends RuntimeException {
 

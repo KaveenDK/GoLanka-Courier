@@ -10,7 +10,6 @@ package lk.ijse.edu.golankacourier.controller;
  * --------------------------------------------
  **/
 
-import jakarta.servlet.http.Part;
 import jakarta.validation.Valid;
 import lk.ijse.edu.golankacourier.dto.driver.DriverApplicationDto;
 import lk.ijse.edu.golankacourier.entity.DriverApplication;
@@ -29,7 +28,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +47,6 @@ public class DriverController {
     private final UserService userService;
     private final ParcelService parcelService;
 
-    /**
-     * Submit driver application (multipart/form-data).
-     * Example: form fields + file input name "document"
-     */
     @PostMapping(value = "/drivers/apply", consumes = {"multipart/form-data"})
     public ResponseEntity<Map<String,Object>> apply(@ModelAttribute @Valid DriverApplicationDto dto) {
         String documentPath = null;
@@ -81,9 +75,6 @@ public class DriverController {
         return ResponseEntity.ok(list);
     }
 
-    /**
-     * Driver updates parcel status (and optionally location).
-     */
     @PostMapping("/parcels/{id}/status")
     @PreAuthorize("hasAuthority('ROLE_DRIVER')")
     public ResponseEntity<Map<String,Object>> updateParcelStatus(@PathVariable Long id,

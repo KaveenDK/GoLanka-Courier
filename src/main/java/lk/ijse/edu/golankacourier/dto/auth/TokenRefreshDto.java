@@ -14,10 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Response after calling refresh token endpoint.
- * Server typically rotates refresh token via HttpOnly cookie and returns a new access token here.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

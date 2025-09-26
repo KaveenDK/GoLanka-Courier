@@ -24,23 +24,12 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * TokenService - manages persisted refresh tokens.
- *
- * Notes on production hardening:
- * - Consider hashing the refresh token before storing (store hash + compare hashed incoming token),
- *   to protect tokens in case DB is leaked. That implies saving findByHashedToken hash lookup method.
- * - Consider limiting tokens-per-user (one per device) or revoke-all-on-password-change.
- */
 @Service
 @RequiredArgsConstructor
 public class TokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    /**
-     * Refresh token lifetime in milliseconds (configured).
-     */
     @Value("${jwt.refresh-token-exp-ms:2592000000}")
     private long refreshTokenExpMs;
 
@@ -48,12 +37,6 @@ public class TokenService {
         return refreshTokenExpMs;
     }
 
-    /**
-     * Create and persist a refresh token for the given user.
-     *
-     * @param user user
-     * @return raw token string (caller should set cookie)
-     */
     @Transactional
     public String createRefreshToken(User user) {
         String token = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
@@ -70,13 +53,6 @@ public class TokenService {
         return token;
     }
 
-    /**
-     * Validate a refresh token value and return stored entity.
-     * Throws IllegalArgumentException if invalid or expired.
-     *
-     * @param token raw token value
-     * @return stored RefreshToken entity
-     */
     @Transactional
     public RefreshToken validateRefreshToken(String token) {
         Optional<RefreshToken> maybe = refreshTokenRepository.findByToken(token);
@@ -93,12 +69,6 @@ public class TokenService {
         return rt;
     }
 
-    /**
-     * Rotate refresh token: revoke old token and create a new one for same user.
-     *
-     * @param oldToken raw token string
-     * @return new raw token string
-     */
     @Transactional
     public String rotateRefreshToken(String oldToken) {
         RefreshToken old = validateRefreshToken(oldToken);
@@ -109,9 +79,6 @@ public class TokenService {
         return createRefreshToken(old.getUser());
     }
 
-    /**
-     * Revoke a specific refresh token value.
-     */
     @Transactional
     public void revokeRefreshToken(String token) {
         refreshTokenRepository.findByToken(token).ifPresent(rt -> {
@@ -120,9 +87,6 @@ public class TokenService {
         });
     }
 
-    /**
-     * Revoke all refresh tokens for a user (useful on password change).
-     */
     @Transactional
     public void revokeAllForUser(User user) {
         refreshTokenRepository.findByUserAndRevokedFalse(user)

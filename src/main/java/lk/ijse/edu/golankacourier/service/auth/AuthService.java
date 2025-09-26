@@ -37,15 +37,6 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * AuthService - core authentication operations: signup, login, refresh, logout.
- *
- * Notes:
- * - This service expects a JwtProvider bean with a method `String generateAccessToken(User user)` that
- *   creates a signed JWT for the given user.
- * - Refresh tokens are managed by TokenService (persisted in DB). Refresh tokens are set to client as
- *   an HttpOnly cookie by this service.
- */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -62,10 +53,6 @@ public class AuthService {
 
     @Value("${app.mail.from:}")
     private String mailFrom;
-
-    // -------------------------
-    // Registration / verification
-    // -------------------------
 
     @Transactional
     public AuthResponseDto registerCustomer(RegisterCustomerDto dto) {
@@ -93,7 +80,6 @@ public class AuthService {
 
         // generate verification code and send email
         String code = generateVerificationCode();
-        // TODO: persist verification code with expiry (DB table) rather than relying on memory.
         emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), code);
 
         return new AuthResponseDto(true, "Registration successful. Verification code sent to email.");
@@ -105,39 +91,19 @@ public class AuthService {
         return String.valueOf(r);
     }
 
-    /**
-     * Verify account using a code.
-     * NOTE: This method assumes you have a persistent store for verification codes. We leave persistence out
-     * from this example and only show the method signature that should be called from your controller.
-     */
+
     @Transactional
     public AuthResponseDto verifyEmail(String email, String code) {
-        // TODO: Implement verification token lookup; this is a placeholder.
-        // Example:
-        //  VerificationToken token = verificationTokenRepo.findValidTokenByEmail(email, code);
-        //  if token == null -> return failure; else set user.enabled = true
         Optional<User> maybe = userRepository.findByEmail(email);
         if (maybe.isEmpty()) {
             return new AuthResponseDto(false, "No user found for email");
         }
         User user = maybe.get();
-        // TODO: check code validity here
         user.setEnabled(true);
         userRepository.save(user);
         return new AuthResponseDto(true, "Email verified successfully");
     }
 
-    // -------------------------
-    // Login / Logout / Refresh
-    // -------------------------
-
-    /**
-     * Authenticate user credentials, issue access token & refresh cookie.
-     *
-     * @param req      AuthRequestDto with email & password
-     * @param response HttpServletResponse used to set HttpOnly refresh token cookie
-     * @return LoginResponseDto containing access token and metadata
-     */
     @Transactional
     public LoginResponseDto login(AuthRequestDto req, HttpServletResponse response) {
         String email = req.getEmail().toLowerCase(Locale.ROOT);
@@ -176,13 +142,7 @@ public class AuthService {
         return new LoginResponseDto(accessToken, "Bearer", expiresInSeconds, roles);
     }
 
-    /**
-     * Rotate/refresh access token using refresh token (cookie value).
-     *
-     * @param incomingRefreshToken raw token (value from cookie)
-     * @param response             HttpServletResponse to set new refresh cookie (rotated token)
-     * @return TokenRefreshDto containing new access token and expiry
-     */
+
     @Transactional
     public TokenRefreshDto refreshAccessToken(String incomingRefreshToken, HttpServletResponse response) {
         if (!StringUtils.hasText(incomingRefreshToken)) {
@@ -212,12 +172,7 @@ public class AuthService {
         return new TokenRefreshDto(newAccessToken, "Bearer", expiresInSeconds);
     }
 
-    /**
-     * Logout: revoke refresh token(s) and clear cookie.
-     *
-     * @param refreshToken value of the cookie (may be null)
-     * @param response     used to clear cookie
-     */
+
     @Transactional
     public void logout(String refreshToken, HttpServletResponse response) {
         if (StringUtils.hasText(refreshToken)) {
@@ -236,38 +191,23 @@ public class AuthService {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    // -------------------------
-    // Password reset flows (skeletons)
-    // -------------------------
 
-    /**
-     * Initiate forgot-password flow. Sends email with reset link/token.
-     */
     public void forgotPassword(String email) {
         Optional<User> maybe = userRepository.findByEmail(email);
         if (maybe.isEmpty()) {
-            // don't disclose user existence; optionally log
             return;
         }
         User user = maybe.get();
         String token = UUID.randomUUID().toString();
-        // TODO: persist a password-reset token entity with expiry
         emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), token);
     }
 
-    /**
-     * Reset password using token (skeleton).
-     */
+
     @Transactional
     public AuthResponseDto resetPassword(String token, String newPassword, String confirmPassword) {
         if (!newPassword.equals(confirmPassword)) {
             return new AuthResponseDto(false, "Passwords do not match");
         }
-        // TODO: validate reset token and find associated user
-        // Example:
-        // PasswordResetToken prt = passwordResetRepo.findByToken(token);
-        // if invalid -> return failure
-        // else update user's password and delete token
         return new AuthResponseDto(true, "Password reset successful (TODO: implement token validation)");
     }
 }

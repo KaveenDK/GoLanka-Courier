@@ -16,10 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO used for resetting a user's password.
- * The token is the one issued by the server in the "forgot password" flow.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

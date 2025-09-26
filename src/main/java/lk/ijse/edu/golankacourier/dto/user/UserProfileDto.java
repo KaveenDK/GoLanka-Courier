@@ -18,16 +18,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for updating or returning user profile information.
- * Email can be included but consider verifying it if user changes it (server flow).
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProfileDto {
 
-    private Long id; // optional: present when returning profile
+    private Long id;
 
     @NotBlank(message = "Full name is required")
     @Size(max = 200)
@@ -47,9 +43,6 @@ public class UserProfileDto {
     @Size(max = 1000)
     private String address;
 
-    /**
-     * Optional public URL to profile image (if you support uploads).
-     */
     @Size(max = 500)
     private String profileImageUrl;
 }

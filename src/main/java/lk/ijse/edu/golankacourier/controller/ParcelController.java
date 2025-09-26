@@ -10,17 +10,22 @@ package lk.ijse.edu.golankacourier.controller;
  * --------------------------------------------
  **/
 
+import jakarta.validation.Valid;
+import lk.ijse.edu.golankacourier.dto.parcel.ParcelCreateDto;
 import lk.ijse.edu.golankacourier.dto.parcel.ParcelSummaryDto;
+import lk.ijse.edu.golankacourier.dto.parcel.ParcelDto;
 import lk.ijse.edu.golankacourier.entity.Parcel;
 import lk.ijse.edu.golankacourier.entity.User;
 import lk.ijse.edu.golankacourier.repository.ParcelRepository;
 import lk.ijse.edu.golankacourier.repository.UserRepository;
+import lk.ijse.edu.golankacourier.service.ParcelService;
+import lk.ijse.edu.golankacourier.service.UserService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,21 +37,24 @@ public class ParcelController {
 
     private final ParcelRepository parcelRepository;
     private final UserRepository userRepository;
+    private final ParcelService parcelService;
+    private final UserService userService;
 
-    public ParcelController(ParcelRepository parcelRepository, UserRepository userRepository) {
+    public ParcelController(ParcelRepository parcelRepository,
+                            UserRepository userRepository,
+                            ParcelService parcelService,
+                            UserService userService) {
         this.parcelRepository = parcelRepository;
         this.userRepository = userRepository;
+        this.parcelService = parcelService;
+        this.userService = userService;
     }
 
-    /**
-     * GET /api/parcels?limit=10
-     * Returns recent parcels for the current user (customer) or assigned parcels for driver.
-     */
     @GetMapping
     public ResponseEntity<List<ParcelSummaryDto>> listParcels(
             @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getName() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -75,14 +83,9 @@ public class ParcelController {
         return ResponseEntity.ok(results);
     }
 
-    /**
-     * GET /api/parcels/{id}
-     * Return parcel detail (allowed for parcel owner, assigned driver or admin).
-     * Note: return type ResponseEntity<?> to avoid generic variance compilation issues.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getParcel(@PathVariable("id") Long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getName() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -105,5 +108,21 @@ public class ParcelController {
                     return ResponseEntity.ok(parcel);
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createParcel(@AuthenticationPrincipal UserDetails ud,
+                                          @Valid @RequestBody ParcelCreateDto dto) {
+        if (ud == null || ud.getUsername() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = userService.findByEmail(ud.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Parcel created = parcelService.createParcel(user.getId(), dto);
+        ParcelDto out = parcelService.toDto(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(out);
     }
 }

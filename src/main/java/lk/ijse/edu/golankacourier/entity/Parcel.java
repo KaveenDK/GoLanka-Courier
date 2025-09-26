@@ -10,15 +10,30 @@ package lk.ijse.edu.golankacourier.entity;
  * --------------------------------------------
  **/
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "parcels", indexes = {
@@ -45,38 +60,20 @@ public class Parcel {
     @JoinColumn(name = "assigned_driver_id")
     private User assignedDriver;
 
-    // Pickup info
     @Column(name = "pickup_address", length = 1000)
     private String pickupAddress;
 
-    @Column(name = "pickup_latitude")
-    private Double pickupLatitude;
-
-    @Column(name = "pickup_longitude")
-    private Double pickupLongitude;
-
-    // Delivery info
     @Column(name = "delivery_address", length = 1000)
     private String deliveryAddress;
 
-    @Column(name = "delivery_latitude")
-    private Double deliveryLatitude;
-
-    @Column(name = "delivery_longitude")
-    private Double deliveryLongitude;
-
-    // Parcel details
-    @Column(precision = 10, scale = 2)
+    @Column(name = "price", precision = 14, scale = 2)
     private BigDecimal price;
 
-    @Column(precision = 10, scale = 2)
+    @Column(name = "weight", precision = 10, scale = 2)
     private BigDecimal weight;
 
-    /**
-     * Human-friendly dimensions string like "30x20x10 cm".
-     */
     @Column(length = 200)
-    private String dimensions; // <-- this field fixes your builder error
+    private String dimensions;
 
     @Column(length = 2000)
     private String notes;
@@ -84,7 +81,12 @@ public class Parcel {
     @Column(length = 50)
     private String status;
 
-    // Status history
+    @Column(name = "scheduled_pickup_at")
+    private LocalDateTime scheduledPickupAt;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
+
     @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<ParcelStatusHistory> statusHistory = new ArrayList<>();

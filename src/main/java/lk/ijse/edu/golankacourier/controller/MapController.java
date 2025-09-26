@@ -27,10 +27,6 @@ public class MapController {
     @Value("${google.maps.api-key:}")
     private String googleApiKey;
 
-    /**
-     * Proxy for Google Geocoding API to avoid exposing server key for server-side geocoding.
-     * For client-side maps (Maps JS), use a browser-restricted API key and call Google directly.
-     */
     @GetMapping("/geocode")
     public ResponseEntity<String> geocode(@RequestParam String address) {
         if (googleApiKey == null || googleApiKey.isBlank()) {

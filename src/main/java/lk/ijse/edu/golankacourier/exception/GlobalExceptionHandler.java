@@ -28,9 +28,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Global exception handler that returns consistent JSON error responses.
- */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -96,7 +93,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // --- helper DTOs for error responses ---
 
     public static class ApiError {
         private int status;

@@ -17,9 +17,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Repository for ParcelStatusHistory entries.
- */
 @Repository
 public interface ParcelStatusHistoryRepository extends JpaRepository<ParcelStatusHistory, Long> {
 
